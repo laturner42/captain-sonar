@@ -2,15 +2,21 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams } = require('../captian-ui/src/constants');
 const { Systems } = require('../captian-ui/src/components/systems');
 
 const connections = {};
 const players = {};
 
 const newTeam = (teamNbr) => {
-    const team = {
+    return {
         teamNbr,
+        roles: {
+            [Jobs.CAPTAIN]: null,
+            [Jobs.FIRSTMATE]: null,
+            [Jobs.NAVIGATOR]: null,
+            [Jobs.ENGINEER]: null,
+        },
         systems: {
             [Systems.Torpedo]: {
                 max: 3,
@@ -43,12 +49,12 @@ const newTeam = (teamNbr) => {
         pendingMove: null,
         pastShipPaths: [],
     };
-    return team;
 }
 
 const generateNewGame = () => {
     const newGameState = {
         players,
+        gameStarted: false,
         leader: null,
     };
     newGameState.team1 = newTeam(1);
@@ -94,18 +100,39 @@ const takeDownSystem = (team, system) => {
 const parseMessage = async (packet, connection) => {
     const { type, name, data } = packet;
 
-    console.debug(name, 'has joined');
     connections[name] = connection;
 
     if (!players[name]) {
+        console.debug(name, 'has joined');
         await playerJoin(name);
     }
 
-    // TODO
-    const myTeam = gameState.team1;
+    const {
+        myTeam
+    } = getTeams(gameState.team1, gameState.team2, name);
 
     switch (type) {
         case MessageTypes.JOIN:
+            break;
+        case MessageTypes.ASSIGN_PLAYER:
+            const {
+                newJob,
+                playerName,
+                teamNbr: newTeamNbr,
+            } = data;
+            const newTeam = newTeamNbr === 1 ? gameState.team1 : gameState.team2;
+            newTeam.roles[newJob] = playerName;
+            break;
+        case MessageTypes.REMOVE_PLAYER:
+            const {
+                oldJob,
+                teamNbr: oldTeamNbr,
+            } = data;
+            const oldTeam = oldTeamNbr === 1 ? gameState.team1 : gameState.team2;
+            oldTeam.roles[oldJob] = null;
+            break;
+        case MessageTypes.START_GAME:
+            gameState.gameStarted = true;
             break;
         case MessageTypes.SET_START:
             const {

@@ -108,7 +108,7 @@ export default function Captain(props) {
                 }
             </div>
             <ToolBelt>
-                <CaptainMap pendingDirection={pendingMove && pendingMove.direction} sendMessage={sendMessage} disabledDirections={disabledDirections} />
+                <CaptainMap active={!pendingMove && startSelected} pendingDirection={pendingMove && pendingMove.direction} sendMessage={sendMessage} disabledDirections={disabledDirections} />
                 {
                     !startSelected &&
                         <ConfirmSelection job={Jobs.CAPTAIN} sendMessage={sendMessage} />

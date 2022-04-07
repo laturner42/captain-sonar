@@ -19,7 +19,7 @@ export default function CaptainMap(props) {
         let onClick;
 
         const selected = pendingDirection === direction;
-        const disabled = disabledDirections.includes(direction) || !!pendingDirection;
+        const disabled = !active || disabledDirections.includes(direction) || !!pendingDirection;
 
         if (direction) {
             icon = <Arrow />;

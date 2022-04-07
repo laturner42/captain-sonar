@@ -1,38 +1,34 @@
 import { useState, useEffect } from 'react';
 import {
-    CheckRounded as Check,
-    MoreHoriz as Waiting,
+
 } from '@mui/icons-material';
 import {
-    BOARD_WIDTH,
-    BOARD_HEIGHT,
     MessageTypes,
-    Jobs as ScreenNames,
 } from './constants';
 
-import Captain from './screens/Captain';
-import Navigator from './screens/Navigator';
-import FirstMate from './screens/FirstMate';
-import Engineer from './screens/Engineer';
+import Gameplay from './components/Gameplay';
+import Join from './screens/Join';
+import SetRoles from './screens/SetRoles';
 
 export default function App() {
     const [socket, setSocket] = useState(null);
     const [gameData, setGameData] = useState(null);
-    const [activeScreen, setActiveScreen] = useState(ScreenNames.CAPTAIN);
+    const [myName, setMyName] = useState('');
 
     const sendMessage = (type, data, forceSocket) => (forceSocket || socket).send(JSON.stringify({
-        name: 'name',
+        name: myName,
         type,
         data,
     }))
 
     const join = () => {
+        console.log('oh my god were joining');
         sendMessage(MessageTypes.JOIN)
     }
 
     useEffect(() => {
-        if (socket) {
-            join();
+        if (!socket) {
+            setTimeout(connect, 1000);
         }
     }, [socket])
 
@@ -42,6 +38,9 @@ export default function App() {
         ws.onopen = () => {
             console.log('Connected');
             setSocket(ws);
+            if (myName && gameData) {
+                join();
+            }
         };
         ws.onmessage = (e) => {
             setGameData(JSON.parse(e.data));
@@ -51,17 +50,6 @@ export default function App() {
             console.error(e);
         }
     }
-
-    useEffect(() => {
-        connect();
-    }, []);
-
-    if (!gameData) return null;
-
-    const {
-        team1: myTeam,
-        team2: enemyTeam,
-    } = gameData;
 
     return (
         <div style={{
@@ -74,81 +62,47 @@ export default function App() {
             fontSize: 'calc(10px + 2vmin)',
             color: 'white',
         }}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'flex-end',
-                    transform: 'rotate(-90deg)',
-                    width: 70,
-                    height: 70,
-                    fontSize: 18,
-                }}
-            >
-                {
-                    Object.values(ScreenNames).map(screen => (
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            {
-                                !!myTeam.pendingMove && !myTeam.pendingMove.confirmed[screen] && (
-                                    <div
-                                        style={{
-                                            color: '#aaa',
-                                            transform: 'rotate(90deg)',
-                                        }}
-                                    >
-                                        <Waiting />
-                                    </div>
-                                )
-                            }
-                            {
-                                !!myTeam.pendingMove && myTeam.pendingMove.confirmed[screen] && (
-                                    <div
-                                        style={{
-                                            color: 'lime',
-                                            transform: 'rotate(90deg)',
-                                        }}
-                                    >
-                                        <Check />
-                                    </div>
-                                )
-                            }
-                            <div
-                                style={{
-                                    borderWidth: 3,
-                                    borderStyle: activeScreen === screen ? 'solid' : 'dashed',
-                                    cursor: activeScreen === screen ? undefined : 'pointer',
-                                    borderColor: 'brown',
-                                    borderRadius: 10,
-                                    margin: 5,
-                                    paddingLeft: 5,
-                                    paddingRight: 5,
-                                }}
-                                onClick={() => setActiveScreen(screen)}
-                            >
-                                <span>{screen}</span>
-                            </div>
-                        </div>
-                    ))
-                }
-            </div>
             {
-                activeScreen === ScreenNames.CAPTAIN && <Captain sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                !socket && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            left: 5,
+                            top: 5,
+                            color: '#fcc',
+                            fontSize: 12,
+                        }}
+                    >
+                        <span>Connecting...</span>
+                    </div>
+                )
             }
             {
-                activeScreen === ScreenNames.NAVIGATOR && <Navigator sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                !gameData && (
+                    <Join
+                        myName={myName}
+                        setMyName={setMyName}
+                        join={join}
+                        connected={!!socket}
+                    />
+                )
             }
             {
-                activeScreen === ScreenNames.FIRSTMATE && <FirstMate sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                !!gameData && !gameData.gameStarted && (
+                    <SetRoles
+                        sendMessage={sendMessage}
+                        gameData={gameData}
+                    />
+                )
             }
             {
-                activeScreen === ScreenNames.ENGINEER && <Engineer sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                !!gameData && gameData.gameStarted && (
+                    <Gameplay
+                        sendMessage={sendMessage}
+                        gameData={gameData}
+                        myName={myName}
+                    />
+                )
             }
         </div>
     );

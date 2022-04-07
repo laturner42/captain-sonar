@@ -142,6 +142,7 @@ export default function Grid(props) {
                 margin: 0,
                 marginLeft: manualOffsetX,
                 marginTop: manualOffsetY,
+                cursor: onMouseMove ? 'grab' : undefined,
             }}
             draggable="false"
             onMouseDown={onMouseDown}
