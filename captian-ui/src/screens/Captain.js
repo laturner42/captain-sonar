@@ -8,13 +8,14 @@ import {
     TILE_SIZE,
     Directions,
     BOARD_HEIGHT,
-    BOARD_WIDTH,
+    BOARD_WIDTH, MAP_WIDTH, MAP_HEIGHT,
 } from '../constants';
 import {
     Systems,
 } from '../components/systems';
 import map from '../components/rename.png';
 import Grid from '../components/Grid';
+import Map from '../components/Map';
 import CaptainMap from '../components/toolbelt/CaptainMap';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import { convertServerPath } from '../components/Path';
@@ -31,8 +32,8 @@ export default function Captain(props) {
         sendMessage,
     } = props;
 
-    const [placementCol, setPlacementCol] = useState(Math.floor(BOARD_WIDTH / 2));
-    const [placementRow, setPlacementRow] = useState(Math.floor(BOARD_HEIGHT / 2))
+    const [placementCol, setPlacementCol] = useState(myTeam.currentShipPath.startCol);
+    const [placementRow, setPlacementRow] = useState(myTeam.currentShipPath.startRow)
 
     const { startSelected } = myTeam;
     const { startSelected: enemyStartSelected } = enemyTeam;
@@ -43,15 +44,15 @@ export default function Captain(props) {
 
     const markerSize = 20;
 
-    const width = boardWidth * TILE_SIZE + TILE_SIZE;
-    const height = boardHeight * TILE_SIZE + TILE_SIZE;
+    const width = MAP_WIDTH + (TILE_SIZE * 2);
+    const height = MAP_HEIGHT + (TILE_SIZE * 2);
 
     const clickMap = (e) => {
         const rect = e.target.getBoundingClientRect();
         const x = e.clientX - rect.left; //x position within the element.
         const y = e.clientY - rect.top;  //y position within the element.
-        const newCol = Math.floor((x / width) * (TILE_SIZE / 2));
-        const newRow = Math.floor((y / height) * (TILE_SIZE / 2));
+        const newCol = Math.floor((x / MAP_WIDTH) * (TILE_SIZE / 2));
+        const newRow = Math.floor((y / MAP_HEIGHT) * (TILE_SIZE / 2));
         setPlacementCol(newCol);
         setPlacementRow(newRow);
         sendMessage(
@@ -83,77 +84,16 @@ export default function Captain(props) {
                     flexDirection: 'row',
                 }}
             >
+                <Map
+                    width={width}
+                    height={height}
+                />
                 <div
                     style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        flexDirection: 'column',
-                        width: TILE_SIZE,
+                        marginLeft: TILE_SIZE,
+                        marginTop: TILE_SIZE,
                     }}
                 >
-                    <div
-                        style={{
-                            marginTop: TILE_SIZE,
-                        }}
-                    />
-                    {
-                        [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map((num) => (
-                            <div
-                                style={{
-                                    height: TILE_SIZE,
-                                    width: TILE_SIZE,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: '#ccf',
-                                    fontSize: 16,
-                                }}
-                            >
-                                {num}
-                            </div>
-                        ))
-                    }
-                </div>
-                <div
-                    // style={{
-                    //     marginLeft: TILE_SIZE,
-                    //     marginTop: TILE_SIZE,
-                    // }}
-                >
-                    <div
-                        style={{
-                            display: 'flex',
-                            height: TILE_SIZE
-                        }}
-                    >
-                        {
-                            ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'].map((num) => (
-                                <div
-                                    style={{
-                                        height: TILE_SIZE,
-                                        width: TILE_SIZE,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#ccf',
-                                        fontSize: 16,
-                                    }}
-                                >
-                                    {num}
-                                </div>
-                            ))
-                        }
-                    </div>
-                    <img
-                        src={map}
-                        alt="The Map"
-                        width={width - TILE_SIZE}
-                        height={height - TILE_SIZE}
-                        style={{
-                            position: 'absolute',
-                        }}
-                    />
                     <Grid
                         width={boardWidth}
                         height={boardHeight}
@@ -168,8 +108,8 @@ export default function Captain(props) {
                             <div
                                 style={{
                                     position: 'absolute',
-                                    left: (TILE_SIZE * placementCol) + (TILE_SIZE / 2) - (markerSize / 2),
-                                    top: (TILE_SIZE * placementRow) + (TILE_SIZE / 2) - (markerSize / 2),
+                                    left: TILE_SIZE + (TILE_SIZE * placementCol) + (TILE_SIZE / 2) - (markerSize / 2),
+                                    top: TILE_SIZE + (TILE_SIZE * placementRow) + (TILE_SIZE / 2) - (markerSize / 2),
                                     width: markerSize - 10,
                                     height: markerSize - 10,
                                     borderStyle: 'solid',
@@ -211,12 +151,17 @@ export default function Captain(props) {
                             disabled={!enableActions}
                             variant="contained"
                             style={{ margin: 5 }}
-
+                            onClick={() => sendMessage(MessageTypes.SURFACE)}
                         >
                             Surface
                         </Button>
                     </div>
                 </div>
+                {
+                    !!myTeam.surfaced && (
+                        <span>Currently Surfaced</span>
+                    )
+                }
                 {
                     !startSelected &&
                         <ConfirmSelection text="Dive!" job={Jobs.CAPTAIN} sendMessage={sendMessage} />

@@ -20,8 +20,8 @@ export default function Navigator(props) {
 
     const { systems, pendingMove } = myTeam;
 
-    const width = boardWidth * TILE_SIZE;
-    const height = boardHeight * TILE_SIZE;
+    const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
+    const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
 
     const onClick = (system) => {
         sendMessage(
@@ -99,8 +99,13 @@ export default function Navigator(props) {
                     }}
                 >
                     <span>Every movement, pick a System to charge.</span>
-                    <span>Once a system is fully charged, it can be triggered by the Captain.</span>
+                    <span>Once a system is fully charged, it can be Deployed by the Captain.</span>
                 </div>
+                <span
+                    style={{ color: 'cyan' }}
+                >
+                    {myTeam.lastActionResult || ''}
+                </span>
             </div>
             <ToolBelt
                 height={height}

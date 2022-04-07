@@ -2,7 +2,7 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams, DependentSubSystem, calculateSector, getCurrentLoc } = require('../captian-ui/src/constants');
 const { Systems } = require('../captian-ui/src/components/systems');
 
 const connections = {};
@@ -11,6 +11,9 @@ const players = {};
 const newTeam = (teamNbr) => {
     return {
         teamNbr,
+        health: 4,
+        surfaced: false,
+        lastActionResult: null,
         roles: {
             [Jobs.CAPTAIN]: null,
             [Jobs.FIRSTMATE]: null,
@@ -40,10 +43,11 @@ const newTeam = (teamNbr) => {
             },
         },
         currentShipPath: {
-            startCol: 0,
-            startRow: 0,
+            startCol: 7,
+            startRow: 7,
             path: [],
         },
+        history: [],
         startSelected: false,
         offlineSystems: [],
         pendingMove: null,
@@ -54,6 +58,7 @@ const newTeam = (teamNbr) => {
 const generateNewGame = () => {
     const newGameState = {
         players,
+        pauseAction: null,
         gameStarted: false,
         leader: null,
     };
@@ -79,6 +84,14 @@ const playerJoin = async (name) => {
         }
     }
     if (!gameState.leader) gameState.leader = name;
+    await updateEveryone();
+}
+
+const takeDamage = (team, amount) => {
+    team.health -= amount;
+    team.history.push(`Took ${amount} Damage`);
+    if (team.health < 0) team.health = 0;
+    // TODO: end game
 }
 
 const takeDownSystem = (team, system) => {
@@ -104,11 +117,12 @@ const parseMessage = async (packet, connection) => {
 
     if (!players[name]) {
         console.debug(name, 'has joined');
-        await playerJoin(name);
+        return await playerJoin(name);
     }
 
     const {
-        myTeam
+        myTeam,
+        enemyTeam,
     } = getTeams(gameState.team1, gameState.team2, name);
 
     switch (type) {
@@ -153,6 +167,7 @@ const parseMessage = async (packet, connection) => {
                     [Jobs.NAVIGATOR]: true,
                 },
             };
+            myTeam.lastActionResult = null;
             break;
         case MessageTypes.SELECT_ENGINEER_SYSTEM:
             if (!myTeam.pendingMove) break;
@@ -175,13 +190,76 @@ const parseMessage = async (packet, connection) => {
             const {
                 [Jobs.ENGINEER]: engineerConfirmed,
                 [Jobs.FIRSTMATE]: firstMateConfirmed,
-            } = myTeam.pendingMove.confirmed
+            } = myTeam.pendingMove.confirmed;
             if (engineerConfirmed && firstMateConfirmed) {
+                const { firstmateSelection } = myTeam.pendingMove;
                 myTeam.currentShipPath.path.push(myTeam.pendingMove.direction);
                 takeDownSystem(myTeam, myTeam.pendingMove.engineerSelection);
-                myTeam.systems[myTeam.pendingMove.firstmateSelection].filled += 1;
+                const filledSystem = myTeam.systems[firstmateSelection];
+                filledSystem.filled += 1;
+                myTeam.history.push(`Head ${myTeam.pendingMove.direction}`);
+                if (filledSystem.filled === filledSystem.max) {
+                    myTeam.history.push(`${firstmateSelection} Ready`);
+                }
                 myTeam.pendingMove = null;
             }
+            break;
+        case MessageTypes.DEPLOY_SYSTEM:
+            const {
+                system: deployedSystem,
+            } = data;
+            myTeam.history.push(`Deploying ${deployedSystem}`);
+            const dependentSubsystem = DependentSubSystem[deployedSystem];
+            let offline = false;
+            for (const subsystem of myTeam.offlineSystems) {
+                if (subsystem.system === dependentSubsystem) {
+                    offline = true;
+                    break;
+                }
+            }
+            if (!offline) {
+                gameState.pauseAction = {
+                    teamNbr: myTeam.teamNbr,
+                    system: deployedSystem,
+                };
+            } else {
+                myTeam.systems[deployedSystem].filled -= 1;
+                takeDamage(myTeam, 1);
+            }
+            break;
+        case MessageTypes.SURFACE:
+            const [ currentCol, currentRow ] = getCurrentLoc(myTeam.currentShipPath);
+            myTeam.history.push(`Surfaced in Sector ${calculateSector(currentCol, currentRow)}`);
+            myTeam.surfaced = true;
+            myTeam.offlineSystems = [];
+            // Dive 60s Later
+            setTimeout(() => {
+                myTeam.history.push('Dove');
+                myTeam.pastShipPaths.push(myTeam.currentShipPath);
+                myTeam.currentShipPath = {
+                    startCol: myTeam.currentShipPath.startCol,
+                    startRow: myTeam.currentShipPath.startRow,
+                    path: [],
+                };
+                myTeam.surfaced = false;
+            }, 60 * 1000);
+            break;
+        case MessageTypes.SCAN_SONAR:
+            const {
+                sector: chosenSector,
+            } = data;
+            const [ enemyCol, enemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
+            const actualSector = calculateSector(enemyCol, enemyRow);
+            myTeam.lastActionResult = `The Enemy is ${actualSector === chosenSector ? '' : 'not '}in Sector ${actualSector}`;
+            myTeam.history.push(`Guessed Sector ${chosenSector}`);
+            gameState.pauseAction = null;
+            break;
+        case MessageTypes.SEND_DRONES:
+            const {
+                message,
+            } = data;
+            enemyTeam.lastActionResult = message;
+            gameState.pauseAction = null;
             break;
         default:
             console.error('Unknown message type', type ,'received from user', name);

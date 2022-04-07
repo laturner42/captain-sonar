@@ -1,4 +1,4 @@
-import {SystemColors} from '../systems';
+import {SystemColors, Systems} from '../systems';
 import {SystemIcons} from '../SystemIcons';
 
 export default function CaptainSystemChoice(props) {
@@ -13,6 +13,14 @@ export default function CaptainSystemChoice(props) {
     const systemSize = 40;
 
     const active = !disabled && systems[system].filled === systems[system].max;
+
+    const titles = {
+        [Systems.Torpedo]: 'Fire a Torpedo up to 4 tiles away',
+        [Systems.Mines]: 'Place a Mine in an adjacent tile',
+        [Systems.Sonar]: 'Ask the enemy if they are in a particular Sector',
+        [Systems.Drone]: 'Get two pieces of info from the enemy - only one is true',
+        [Systems.Silence]: 'Move up to 4 spaces in a single direction without detection',
+    }
 
     return (
         <div
@@ -32,6 +40,7 @@ export default function CaptainSystemChoice(props) {
                 margin: 5,
                 cursor: active && clickable ? 'pointer' : 'not-allowed',
             }}
+            title={titles[system]}
         >
             {SystemIcons[system]}
         </div>

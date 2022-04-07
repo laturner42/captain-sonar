@@ -2,25 +2,36 @@ import { useState } from 'react';
 import {
     TILE_SIZE,
 } from '../constants';
-import map from '../components/rename.png';
 import Grid from '../components/Grid';
+import Map from '../components/Map';
 import Notes from '../components/toolbelt/Notes';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import {convertServerPath} from '../components/Path';
 import SystemChoices from '../components/toolbelt/SystemChoices';
+import EnemyHistory from '../components/toolbelt/EnemyHistory';
 
 export default function Navigator(props) {
     const {
         boardWidth,
         boardHeight,
         enemyTeam,
-        sendMessage,
     } = props;
 
-    const shipPath = convertServerPath(enemyTeam.currentShipPath, true);
+    const [selectedPath, setSelectedPath] = useState(enemyTeam.currentShipPath);
 
-    const width = boardWidth * TILE_SIZE;
-    const height = boardHeight * TILE_SIZE;
+    const changePath = (newPath) => {
+        if (newPath === 'current') {
+            setSelectedPath(enemyTeam.currentShipPath);
+        } else {
+            const index = parseInt(`${newPath}`, 10);
+            setSelectedPath(enemyTeam.pastShipPaths[index]);
+        }
+    }
+
+    const shipPath = convertServerPath(selectedPath, true);
+
+    const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
+    const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
 
     const [offsetCoords, setOffsetCoords] = useState([(width/2) - (TILE_SIZE/2) - TILE_SIZE, (height/2) - (TILE_SIZE/2) - TILE_SIZE]);
     const [dragCoords, setDragCoords] = useState(null);
@@ -33,8 +44,8 @@ export default function Navigator(props) {
 
     const updateOffset = (event) => {
         const offset = [(event.pageX - dragCoords[0]), event.pageY - dragCoords[1]];
-        offset[0] = Math.min(Math.max(offset[0], -TILE_SIZE), (TILE_SIZE * boardWidth) - (TILE_SIZE * shipPath.pathWidth) - TILE_SIZE);
-        offset[1] = Math.min(Math.max(offset[1], -TILE_SIZE), (TILE_SIZE * boardHeight) - (TILE_SIZE * shipPath.pathHeight) - TILE_SIZE);
+        offset[0] = Math.min(Math.max(offset[0], 0), (TILE_SIZE * boardWidth) - (TILE_SIZE * shipPath.pathWidth));
+        offset[1] = Math.min(Math.max(offset[1], 0), (TILE_SIZE * boardHeight) - (TILE_SIZE * shipPath.pathHeight));
         setOffsetCoords(offset);
     }
 
@@ -71,15 +82,7 @@ export default function Navigator(props) {
                     overflow: 'hidden',
                 }}
             >
-                <img
-                    src={map}
-                    width={width}
-                    height={height}
-                    style={{
-                        position: 'absolute',
-                    }}
-                    draggable="false"
-                />
+                <Map />
                 <Grid
                     width={shipPath.pathWidth}
                     height={shipPath.pathHeight}
@@ -102,6 +105,32 @@ export default function Navigator(props) {
                     clickable={false}
                     removeOutlines
                 />
+                <EnemyHistory
+                    enemyTeam={enemyTeam}
+                />
+                <div
+                    style={{
+                        marginTop: 5,
+                        width: '90%',
+                        fontSize: 15,
+                    }}
+                >
+                    <span>Tracking:</span>
+                    <select
+                        onChange={changePath}
+                        style={{
+                            width: '100%',
+                            marginTop: 2,
+                        }}
+                    >
+                        {
+                            enemyTeam.pastShipPaths.map((p, i) => (
+                                <option value={i}>Old Path {i + 1}</option>
+                            ))
+                        }
+                        <option value='current'>Current Path</option>
+                    </select>
+                </div>
             </ToolBelt>
         </div>
     )

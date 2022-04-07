@@ -36,8 +36,8 @@ export default function Navigator(props) {
 
     const { pendingMove, offlineSystems } = myTeam;
 
-    const width = boardWidth * TILE_SIZE;
-    const height = boardHeight * TILE_SIZE;
+    const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
+    const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
 
     const directionOrder = [Directions.West, Directions.North, Directions.South, Directions.East];
 
@@ -238,8 +238,9 @@ export default function Navigator(props) {
                 >
                     <span><span style={{ color: '#f55' }}>1 Ship Damage</span> occurs at the end of a Move if either:</span>
                     <span>- All six Systems for a Cardinal Direction are offline</span>
-                    <span>- All six Reactor Systems are offline</span>
-                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if inclusive 4 Systems are down</span>
+                    <span>- All six Reactors are offline</span>
+                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if inclusive 4 Systems are offline</span>
+                    <span>All Systems will <span style={{ color: '#5f5' }}>Auto-Repair</span> if all six Reactors are offline</span>
                 </div>
             </div>
             <ToolBelt>

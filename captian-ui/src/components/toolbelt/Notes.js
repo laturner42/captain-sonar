@@ -19,7 +19,7 @@ export default function Notes() {
                 style={{
                     border: '0px',
                     width: width * 0.86,
-                    height: width * 0.86,
+                    height: width * 0.55,
                     fontSize: 12,
                     backgroundColor: '#852',
                     color: 'white',

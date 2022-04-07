@@ -16,6 +16,7 @@ import Captain from '../screens/Captain';
 import Navigator from '../screens/Navigator';
 import FirstMate from '../screens/FirstMate';
 import Engineer from '../screens/Engineer';
+import PauseActionScreen from '../screens/PauseActionScreen';
 
 export default function Gameplay(props) {
     const {
@@ -117,6 +118,16 @@ export default function Gameplay(props) {
             }
             {
                 activeScreen === ScreenNames.ENGINEER && <Engineer sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+            }
+            {
+                !!gameData.pauseAction && (
+                     <PauseActionScreen
+                         myTeam={myTeam}
+                         enemyTeam={enemyTeam}
+                         pauseAction={gameData.pauseAction}
+                         sendMessage={sendMessage}
+                     />
+                )
             }
         </div>
     );
