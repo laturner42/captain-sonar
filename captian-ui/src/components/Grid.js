@@ -135,7 +135,8 @@ export default function Grid(props) {
                     repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%)
                 `,
                 backgroundSize: `${TILE_SIZE}px ${TILE_SIZE}px`,
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                backgroundColor: `rgba(255, 255, 255, ${onMouseMove ? 0.25 : 0})`,
+                borderRadius: onMouseMove ? TILE_SIZE : 0,
                 width: ((width + (boardMargin * 2)) * TILE_SIZE) + 1,
                 height: ((height + (boardMargin * 2)) * TILE_SIZE) + 1,
                 margin: 0,

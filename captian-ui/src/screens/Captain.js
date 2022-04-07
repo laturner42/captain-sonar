@@ -4,6 +4,8 @@ import {
     MessageTypes,
     TILE_SIZE,
     Directions,
+    BOARD_HEIGHT,
+    BOARD_WIDTH,
 } from '../constants';
 import map from '../components/rename.png';
 import Grid from '../components/Grid';
@@ -20,8 +22,8 @@ export default function Captain(props) {
         sendMessage,
     } = props;
 
-    const [placementCol, setPlacementCol] = useState(0);
-    const [placementRow, setPlacementRow] = useState(0);
+    const [placementCol, setPlacementCol] = useState(Math.floor(BOARD_WIDTH / 2));
+    const [placementRow, setPlacementRow] = useState(Math.floor(BOARD_HEIGHT / 2))
 
     const disabledDirections = [Directions.East];
 

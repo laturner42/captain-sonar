@@ -44,7 +44,6 @@ export default function App() {
             setSocket(ws);
         };
         ws.onmessage = (e) => {
-            console.log('got new game data');
             setGameData(JSON.parse(e.data));
         }
         ws.onclose = (e) => {
