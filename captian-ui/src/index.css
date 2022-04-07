@@ -12,7 +12,15 @@ code {
     monospace;
 }
 
-::selection {
+div::selection {
   color: none;
   background: none;
+}
+
+div {
+  /*display: flex;*/
+}
+
+span {
+  user-select: none;
 }

@@ -2,15 +2,61 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs } = require('../captian-ui/src/constants');
+const { Systems } = require('../captian-ui/src/components/systems');
 
 const connections = {};
 const players = {};
 
-const gameState = {
-    players,
-    leader: null,
-};
+const newTeam = (teamNbr) => {
+    const team = {
+        teamNbr,
+        systems: {
+            [Systems.Torpedo]: {
+                max: 3,
+                filled: 0,
+            },
+            [Systems.Mines]: {
+                max: 3,
+                filled: 0,
+            },
+            [Systems.Drone]: {
+                max: 4,
+                filled: 0,
+            },
+            [Systems.Sonar]: {
+                max: 3,
+                filled: 0,
+            },
+            [Systems.Silence]: {
+                max: 6,
+                filled: 0,
+            },
+        },
+        currentShipPath: {
+            startCol: 0,
+            startRow: 0,
+            path: [],
+        },
+        startSelected: false,
+        offlineSystems: [],
+        pendingMove: null,
+        pastShipPaths: [],
+    };
+    return team;
+}
+
+const generateNewGame = () => {
+    const newGameState = {
+        players,
+        leader: null,
+    };
+    newGameState.team1 = newTeam(1);
+    newGameState.team2 = newTeam(2);
+    return newGameState;
+}
+
+let gameState = generateNewGame();
 
 const updateEveryone = async () => {
     return Promise.all(
@@ -27,26 +73,95 @@ const playerJoin = async (name) => {
         }
     }
     if (!gameState.leader) gameState.leader = name;
-    await updateEveryone();
+}
+
+const takeDownSystem = (team, system) => {
+    team.offlineSystems.push(system);
+    const counts = {};
+    for (const system of team.offlineSystems) {
+        if (!counts[system.subsystem]) {
+            counts[system.subsystem] = 0;
+        }
+        counts[system.subsystem] += 1;
+    }
+    for (const subsystem of Object.keys(counts)) {
+        if (counts[subsystem] === 4) {
+            team.offlineSystems = team.offlineSystems.filter(system => system.subsystem !== subsystem);
+        }
+    }
 }
 
 const parseMessage = async (packet, connection) => {
     const { type, name, data } = packet;
 
+    console.debug(name, 'has joined');
+    connections[name] = connection;
+
     if (!players[name]) {
-        console.debug(name, 'has joined');
-        connections[name] = connection;
         await playerJoin(name);
     }
 
+    // TODO
+    const myTeam = gameState.team1;
+
     switch (type) {
         case MessageTypes.JOIN:
+            break;
+        case MessageTypes.SET_START:
+            const {
+                startCol,
+                startRow,
+            } = data;
+            myTeam.currentShipPath.startCol = startCol;
+            myTeam.currentShipPath.startRow = startRow;
+            break;
+        case MessageTypes.HEAD:
+            const { direction } = data;
+            myTeam.pendingMove = {
+                direction,
+                confirmed: {
+                    [Jobs.FIRSTMATE]: false,
+                    [Jobs.ENGINEER]: false,
+                    [Jobs.CAPTAIN]: true,
+                    [Jobs.NAVIGATOR]: true,
+                },
+            };
+            break;
+        case MessageTypes.SELECT_ENGINEER_SYSTEM:
+            if (!myTeam.pendingMove) break;
+            const { engineerSelection } = data;
+            myTeam.pendingMove.engineerSelection = engineerSelection;
+            break;
+        case MessageTypes.SELECT_FIRSTMATE_SYSTEM:
+            if (!myTeam.pendingMove) break;
+            const { firstmateSelection } = data;
+            myTeam.pendingMove.firstmateSelection = firstmateSelection;
+            break;
+        case MessageTypes.CONFIRM_SELECTION:
+            const { job } = data;
+            if (job === Jobs.CAPTAIN && !myTeam.startSelected) {
+                myTeam.startSelected = true;
+                break;
+            }
+            if (!myTeam.pendingMove) break;
+            myTeam.pendingMove.confirmed[job] = true;
+            const {
+                [Jobs.ENGINEER]: engineerConfirmed,
+                [Jobs.FIRSTMATE]: firstMateConfirmed,
+            } = myTeam.pendingMove.confirmed
+            if (engineerConfirmed && firstMateConfirmed) {
+                myTeam.currentShipPath.path.push(myTeam.pendingMove.direction);
+                takeDownSystem(myTeam, myTeam.pendingMove.engineerSelection);
+                myTeam.systems[myTeam.pendingMove.firstmateSelection].filled += 1;
+                myTeam.pendingMove = null;
+            }
             break;
         default:
             console.error('Unknown message type', type ,'received from user', name);
             console.debug(packet);
             break;
     }
+    await updateEveryone();
 };
 
 const httpServer = http.createServer();
@@ -56,7 +171,6 @@ const wsServer = new WebSocketServer({ httpServer });
 wsServer.on('request', (request) => {
     console.debug('New connection');
     const connection = request.accept(null, request.origin);
-    console.log(connection);
     connection.on('message', (message) => {
         const packet = JSON.parse(message.utf8Data);
         return parseMessage(packet, connection);

@@ -52,3 +52,11 @@ export default class Path {
         }
     };
 }
+
+export const convertServerPath = (currentShipPath) => {
+    const shipPath = new Path(currentShipPath.startCol, currentShipPath.startRow);
+    for (const dir of currentShipPath.path) {
+        shipPath.move(dir);
+    }
+    return shipPath
+}

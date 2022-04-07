@@ -1,12 +1,4 @@
-import {
-    Rocket as Torpedo,
-    SportsSoccer as Mines,
-    ConnectingAirports as Drone,
-    TrackChanges as Sonar,
-    HearingDisabled as Silence,
-} from '@mui/icons-material';
-
-export const Systems = {
+const Systems = {
     Torpedo: 'Torpedo',
     Mines: 'Mines',
     Drone: 'Drone',
@@ -14,18 +6,32 @@ export const Systems = {
     Silence: 'Silence',
 }
 
-export const SystemIcons = {
-    [Systems.Torpedo]: <Torpedo fontSize="inherit" />,
-    [Systems.Mines]: <Mines fontSize="inherit" />,
-    [Systems.Drone]: <Drone fontSize="inherit" />,
-    [Systems.Sonar]: <Sonar fontSize="inherit" />,
-    [Systems.Silence]: <Silence fontSize="inherit" />,
-};
-
-export const SystemColors = {
+const SystemColors = {
     [Systems.Torpedo]: 'red',
     [Systems.Mines]: 'red',
     [Systems.Drone]: 'green',
     [Systems.Sonar]: 'green',
-    [Systems.Silence]: 'gold',
+    [Systems.Silence]: '#ddb600',
 }
+
+
+const SubSystems = {
+    Weapons: 'Weapons',
+    Search: 'Search',
+    Flee: 'Flee',
+    Reactor: 'Reactor',
+}
+
+const SubSystemsColors = {
+    [SubSystems.Weapons]: SystemColors[Systems.Torpedo],
+    [SubSystems.Search]: SystemColors[Systems.Sonar],
+    [SubSystems.Flee]: SystemColors[Systems.Silence],
+    [SubSystems.Reactor]: 'blue',
+}
+
+module.exports = {
+    Systems,
+    SystemColors,
+    SubSystems,
+    SubSystemsColors,
+};

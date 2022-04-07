@@ -1,28 +1,29 @@
 import { useState } from 'react';
 import {
-    BOARD_WIDTH,
-    BOARD_HEIGHT,
-    Directions,
     TILE_SIZE,
 } from '../constants';
 import map from '../components/rename.png';
 import Grid from '../components/Grid';
 import Notes from '../components/toolbelt/Notes';
+import ToolBelt from '../components/toolbelt/ToolBelt';
+import {convertServerPath} from '../components/Path';
 
 export default function Navigator(props) {
     const {
         boardWidth,
         boardHeight,
-        shipPath,
+        enemyTeam,
+        sendMessage,
     } = props;
 
-    const [offsetCoords, setOffsetCoords] = useState([0, 0]);
-    const [dragCoords, setDragCoords] = useState(null);
-
-    const toolBeltWidth = 200;
+    const shipPath = convertServerPath(enemyTeam.currentShipPath);
 
     const width = boardWidth * TILE_SIZE;
     const height = boardHeight * TILE_SIZE;
+
+    const [offsetCoords, setOffsetCoords] = useState([(width/2) - (TILE_SIZE/2) - TILE_SIZE, (height/2) - (TILE_SIZE/2) - TILE_SIZE]);
+    const [dragCoords, setDragCoords] = useState(null);
+
 
     const dragStart = (event) => {
         event.preventDefault();
@@ -53,49 +54,47 @@ export default function Navigator(props) {
     return (
         <div
             style={{
-                width: width + toolBeltWidth,
-                height,
-                border: '10px solid #853',
-                borderRadius: 5,
-                position: 'relative',
                 display: 'flex',
                 flexDirection: 'row',
-                overflow: 'hidden',
             }}
         >
-            <img
-                src={map}
-                width={width}
-                height={height}
-                style={{
-                    position: 'absolute',
-                }}
-                draggable="false"
-            />
-            <Grid
-                width={shipPath.pathWidth}
-                height={shipPath.pathHeight}
-                path={shipPath}
-                boardMargin={1}
-                lineColor="black"
-                manualOffsetX={offsetCoords[0]}
-                manualOffsetY={offsetCoords[1]}
-                onMouseDown={dragStart}
-                onMouseMove={onDrag}
-                onMouseUp={dragEnd}
-            />
             <div
                 style={{
-                    marginLeft: width,
-                    width: toolBeltWidth,
-                    padding: 10,
+                    width,
+                    height,
+                    border: '10px solid #853',
+                    borderRadius: 5,
+                    position: 'relative',
                     display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    flexDirection: 'row',
+                    overflow: 'hidden',
                 }}
             >
-                <Notes width={toolBeltWidth} />
+                <img
+                    src={map}
+                    width={width}
+                    height={height}
+                    style={{
+                        position: 'absolute',
+                    }}
+                    draggable="false"
+                />
+                <Grid
+                    width={shipPath.pathWidth}
+                    height={shipPath.pathHeight}
+                    path={shipPath}
+                    boardMargin={1}
+                    lineColor="black"
+                    manualOffsetX={offsetCoords[0]}
+                    manualOffsetY={offsetCoords[1]}
+                    onMouseDown={dragStart}
+                    onMouseMove={onDrag}
+                    onMouseUp={dragEnd}
+                />
             </div>
+            <ToolBelt>
+                <Notes />
+            </ToolBelt>
         </div>
     )
 }

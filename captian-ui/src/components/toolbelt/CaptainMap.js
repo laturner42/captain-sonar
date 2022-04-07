@@ -3,22 +3,29 @@ import {
     MyLocation as Compass,
 } from '@mui/icons-material';
 import {
-    Directions,
+    Directions, MessageTypes,
 } from '../../constants';
 
 export default function CaptainMap(props) {
     const {
-        activee,
+        active,
+        pendingDirection,
+        disabledDirections,
+        sendMessage,
     } = props;
 
     const DirectionBlock = ({ direction }) => {
         let icon = <Compass />;
         let onClick;
+
+        const selected = pendingDirection === direction;
+        const disabled = disabledDirections.includes(direction) || !!pendingDirection;
+
         if (direction) {
             icon = <Arrow />;
-            onClick = () => {
-
-            };
+            if (!disabled) {
+                onClick=() => sendMessage(MessageTypes.HEAD, { direction })
+            }
         }
         const rotate = {
             [Directions.South]: 180,
@@ -36,7 +43,10 @@ export default function CaptainMap(props) {
                     justifyContent: 'center',
                     cursor: !!onClick ? 'pointer' : undefined,
                     transform: `rotate(${rotate}deg)`,
+                    opacity: disabled ? 0.5 : 1,
+                    color: selected ? 'lime' : 'white',
                 }}
+                onClick={onClick}
             >
                 {icon}
             </div>

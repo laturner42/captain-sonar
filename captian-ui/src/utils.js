@@ -1,3 +1,0 @@
-import {
-    Directions,
-} from './constants';

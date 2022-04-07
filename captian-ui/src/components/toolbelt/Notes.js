@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import {TILE_SIZE} from '../../constants';
+import { TOOL_BELT_WIDTH } from '../../constants';
 
-export default function Notes(props) {
-    const {
-        width,
-    } = props;
+export default function Notes() {
     const { note, setNote } = useState('');
 
+    const width = TOOL_BELT_WIDTH;
 
     return (
-        <div>
+        <div
+            style={{
+                margin: 5,
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
             <span>Notes</span>
             <textarea
                 style={{

@@ -14,6 +14,7 @@ export default function Grid(props) {
         onMouseDown,
         onMouseUp,
         onMouseMove,
+        hidePath,
     } = props;
 
     const lineThickness = 8;
@@ -146,7 +147,7 @@ export default function Grid(props) {
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
         >
-            {path.directions.length > 0 && lineDivs}
+            {!hidePath && lineDivs}
         </div>
     )
 }
