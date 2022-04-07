@@ -38,7 +38,7 @@ export default function App() {
         ws.onopen = () => {
             console.log('Connected');
             setSocket(ws);
-            if (myName && gameData) {
+            if (myName && gameData.players.map(p => p.name).includes(myName)) {
                 join();
             }
         };
@@ -59,7 +59,7 @@ export default function App() {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 'calc(10px + 2vmin)',
+            fontSize: 'calc(8px + 2vmin)',
             color: 'white',
         }}>
             {
@@ -72,6 +72,7 @@ export default function App() {
                             color: '#fcc',
                             fontSize: 12,
                         }}
+                        onClick={connect}
                     >
                         <span>Connecting...</span>
                     </div>

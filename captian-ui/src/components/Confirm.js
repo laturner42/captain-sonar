@@ -6,6 +6,7 @@ export default function ConfirmSelection(props) {
         job,
         sendMessage,
         disabled,
+        text,
     } = props;
     const [pending, setPending] = useState(false);
 
@@ -39,7 +40,7 @@ export default function ConfirmSelection(props) {
                 }}
                 onClick={off ? undefined : confirmSelection}
             >
-                <span>Confirm</span>
+                <span>{text || 'Confirm'}</span>
             </div>
         </div>
     )

@@ -126,13 +126,14 @@ export default function Grid(props) {
         )
     }
 
+    const gridColor = onMouseMove ? 'rgba(255, 255, 255, 0.2)' : '#ccc';
     return (
         <div
             style={{
                 position: 'absolute',
                 backgroundImage: `
-                    repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
-                    repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%)
+                    repeating-linear-gradient(${gridColor} 0 1px, transparent 1px 100%),
+                    repeating-linear-gradient(90deg, ${gridColor} 0 1px, transparent 1px 100%)
                 `,
                 backgroundSize: `${TILE_SIZE}px ${TILE_SIZE}px`,
                 backgroundColor: `rgba(255, 255, 255, ${onMouseMove ? 0.25 : 0})`,

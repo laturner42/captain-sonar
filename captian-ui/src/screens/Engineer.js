@@ -10,37 +10,11 @@ import {
 } from '../components/systems';
 import {
     SubSystemsIcons,
+    dirIcon,
 } from '../components/SystemIcons';
 import Notes from '../components/toolbelt/Notes';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import ConfirmSelection from '../components/Confirm';
-
-const rotations = {
-    [Directions.North]: 0,
-    [Directions.South]: 180,
-    [Directions.East]: 90,
-    [Directions.West]: -90,
-}
-
-const dirIcon = (direction, oStyle = {}) => (
-    <div
-        style={{
-            ...oStyle,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-        }}
-    >
-        <Arrow style={{ fontSize: 40, color: '#666', position: 'absolute', transform: `rotate(${rotations[direction]}deg)` }} />
-        <span
-            style={{ position: 'relative', fontWeight: 'bold' }}
-        >
-            {direction}
-        </span>
-    </div>
-)
-
 
 export default function Navigator(props) {
     const {
@@ -138,7 +112,7 @@ export default function Navigator(props) {
                     >
                         {
                             directionOrder.map((direction) => (
-                                dirIcon(direction, { marginLeft: width/6.2 })
+                                dirIcon(direction, { marginLeft: width/6.2, color: pendingMove && pendingMove.direction === direction ? 'lime' : 'white' })
                             ))
                         }
                     </div>
@@ -167,6 +141,7 @@ export default function Navigator(props) {
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
+                                            backgroundColor: pendingMove && pendingMove.direction === direction ? 'rgba(255,255,255,0.15)' : undefined,
                                         }}
                                     >
                                         <div
@@ -196,24 +171,28 @@ export default function Navigator(props) {
                                                         && engineerSelection.subsystem === subsystem.name;
                                                 }
 
-                                                const color = selected ? 'black' : 'white';
+                                                let color = selected ? 'black' : 'white';
+                                                const selectable = awaitingSelection && direction === pendingMove.direction;
+                                                if (awaitingSelection && !selectable) {
+                                                    color = '#ddd';
+                                                }
 
                                                 return (
                                                     <div
                                                         style={{
-                                                            opacity: offline ? '0.3' : '1',
+                                                            opacity: offline ? '0.2' : '1',
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
                                                             color,
                                                             backgroundColor: SubSystemsColors[icon],
                                                             borderRadius: iconSize,
-                                                            border: `2px solid ${color}`,
+                                                            border: `2px solid ${selectable ? color : 'none'}`,
                                                             marginLeft: 3,
                                                             marginRight: 3,
-                                                            cursor: offline || !awaitingSelection ? undefined : 'pointer',
+                                                            cursor: offline || !selectable ? undefined : 'pointer',
                                                         }}
-                                                        onClick={awaitingSelection ? () => setCurrentSelection({
+                                                        onClick={selectable ? () => setCurrentSelection({
                                                             direction,
                                                             index: i,
                                                             subsystem: subsystem.name,
@@ -257,10 +236,10 @@ export default function Navigator(props) {
                         width: '90%',
                     }}
                 >
-                    <span><span style={{ color: '#f55' }}>1 Ship Damage</span> occurs at the end of a turn if either:</span>
+                    <span><span style={{ color: '#f55' }}>1 Ship Damage</span> occurs at the end of a Move if either:</span>
                     <span>- All six Systems for a Cardinal Direction are offline</span>
                     <span>- All six Reactor Systems are offline</span>
-                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if all 4 Systems are down</span>
+                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if inclusive 4 Systems are down</span>
                 </div>
             </div>
             <ToolBelt>

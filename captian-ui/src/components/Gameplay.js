@@ -90,7 +90,7 @@ export default function Gameplay(props) {
                             <div
                                 style={{
                                     borderWidth: 3,
-                                    borderStyle: activeScreen === screen ? 'solid' : 'dashed',
+                                    borderStyle: activeScreen === screen ? 'solid' : 'dotted',
                                     cursor: activeScreen === screen ? undefined : 'pointer',
                                     borderColor: 'brown',
                                     borderRadius: 10,
@@ -107,7 +107,7 @@ export default function Gameplay(props) {
                 }
             </div>
             {
-                activeScreen === ScreenNames.CAPTAIN && <Captain sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.CAPTAIN && <Captain sendMessage={sendMessage} myTeam={myTeam} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
                 activeScreen === ScreenNames.NAVIGATOR && <Navigator sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />

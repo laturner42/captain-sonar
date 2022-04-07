@@ -29,9 +29,18 @@ const SubSystemsColors = {
     [SubSystems.Reactor]: 'blue',
 }
 
+const DependentSubSystem = {
+    [Systems.Torpedo]: SubSystems.Weapons,
+    [Systems.Mines]: SubSystems.Weapons,
+    [Systems.Drone]: SubSystems.Search,
+    [Systems.Sonar]: SubSystems.Search,
+    [Systems.Silence]: SubSystems.Flee,
+}
+
 module.exports = {
     Systems,
     SystemColors,
     SubSystems,
     SubSystemsColors,
+    DependentSubSystem,
 };

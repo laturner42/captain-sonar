@@ -7,6 +7,7 @@ import Grid from '../components/Grid';
 import Notes from '../components/toolbelt/Notes';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import {convertServerPath} from '../components/Path';
+import SystemChoices from '../components/toolbelt/SystemChoices';
 
 export default function Navigator(props) {
     const {
@@ -94,6 +95,13 @@ export default function Navigator(props) {
             </div>
             <ToolBelt>
                 <Notes />
+                <SystemChoices
+                    title="Enemy Systems"
+                    team={enemyTeam}
+                    enableActions
+                    clickable={false}
+                    removeOutlines
+                />
             </ToolBelt>
         </div>
     )

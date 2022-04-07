@@ -5,6 +5,7 @@ import {
 import {
     Directions, MessageTypes,
 } from '../../constants';
+import {dirIcon} from '../SystemIcons';
 
 export default function CaptainMap(props) {
     const {
@@ -22,16 +23,11 @@ export default function CaptainMap(props) {
         const disabled = !active || disabledDirections.includes(direction) || !!pendingDirection;
 
         if (direction) {
-            icon = <Arrow />;
+            icon = dirIcon(direction);
             if (!disabled) {
                 onClick=() => sendMessage(MessageTypes.HEAD, { direction })
             }
         }
-        const rotate = {
-            [Directions.South]: 180,
-            [Directions.East]: 90,
-            [Directions.West]: -90,
-        }[direction] || 0;
 
         return (
             <div
@@ -41,10 +37,10 @@ export default function CaptainMap(props) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    cursor: !!onClick ? 'pointer' : undefined,
-                    transform: `rotate(${rotate}deg)`,
+                    cursor: !!onClick ? 'pointer' : 'not-allowed',
                     opacity: disabled ? 0.5 : 1,
                     color: selected ? 'lime' : 'white',
+                    margin: 1,
                 }}
                 onClick={onClick}
             >
@@ -54,14 +50,22 @@ export default function CaptainMap(props) {
     }
 
     return (
-        <div>
+        <div
+            style={{
+                width: '100%',
+            }}
+        >
             <div
                 style={{
+                    margin: 5,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid white',
+                    borderWidth: 2,
+                    borderRadius: 30,
+                    borderColor: '#444',
+                    borderStyle: 'solid',
                 }}
             >
                 <span>Heading</span>

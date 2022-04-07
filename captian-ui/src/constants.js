@@ -44,7 +44,7 @@ const getTeams = (team1, team2, name) => {
     }
     return {
         myTeam,
-        enemyTeam
+        enemyTeam,
     }
 };
 

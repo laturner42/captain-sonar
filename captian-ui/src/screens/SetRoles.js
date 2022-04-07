@@ -53,7 +53,7 @@ export default function SetRoles(props) {
                     height: 30,
                     borderWidth: 2,
                     borderColor: selected ? 'white' : (!playerName && movingPlayer ? '#cff' : '#838'),
-                    borderStyle: (!playerName || !teamNbr) ? 'solid' : undefined,
+                    borderStyle: (playerName || !teamNbr) ? 'solid' : 'dotted',
                     borderRadius: 10,
                     padding: 3,
                     paddingLeft: 6,
