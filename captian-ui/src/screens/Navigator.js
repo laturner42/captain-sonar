@@ -16,7 +16,7 @@ export default function Navigator(props) {
         sendMessage,
     } = props;
 
-    const shipPath = convertServerPath(enemyTeam.currentShipPath);
+    const shipPath = convertServerPath(enemyTeam.currentShipPath, true);
 
     const width = boardWidth * TILE_SIZE;
     const height = boardHeight * TILE_SIZE;

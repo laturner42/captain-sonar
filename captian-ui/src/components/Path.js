@@ -53,8 +53,11 @@ export default class Path {
     };
 }
 
-export const convertServerPath = (currentShipPath) => {
-    const shipPath = new Path(currentShipPath.startCol, currentShipPath.startRow);
+export const convertServerPath = (currentShipPath, recenter = false) => {
+    const shipPath = new Path(
+        recenter ? 0 : currentShipPath.startCol,
+        recenter ? 0 : currentShipPath.startRow,
+        recenter);
     for (const dir of currentShipPath.path) {
         shipPath.move(dir);
     }
