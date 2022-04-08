@@ -24,7 +24,7 @@ const lineTiles = (horizontal, dim = false) => {
                 )
             }
             {
-                values.map((val, i) => (
+                values.map((val) => (
                     <div
                         key={`tile-${val}-${horizontal}-${dim}`}
                         style={{
@@ -38,8 +38,7 @@ const lineTiles = (horizontal, dim = false) => {
                             opacity: dim ? 0.25 : 1.0,
                         }}
                     >
-                        {/*{val}*/}
-                        {i}
+                        {val}
                     </div>
                 ))
             }
