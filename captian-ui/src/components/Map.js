@@ -1,89 +1,97 @@
-import { TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from '../constants';
-import map from './rename.png';
+import {
+    Directions,
+} from '../constants';
+import map1 from './rename.png';
 
-const numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
-const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
-
-const lineTiles = (horizontal, dim = false) => {
-    const values = horizontal ? letters : numbers;
-    return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                flexDirection: horizontal ? 'row' : 'column',
-            }}
-        >
-            {
-                !horizontal && (
-                    <div
-                        style={{
-                            marginTop: TILE_SIZE,
-                        }}
-                    />
-                )
-            }
-            {
-                values.map((val) => (
-                    <div
-                        style={{
-                            width: TILE_SIZE,
-                            height: TILE_SIZE,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#ccf',
-                            fontSize: 16,
-                            opacity: dim ? 0.25 : 1.0,
-                        }}
-                    >
-                        {val}
-                    </div>
-                ))
-            }
-        </div>
-    )
+class Map {
+    constructor(background, islandLocs) {
+        this.background = background;
+        this.islandLocs = islandLocs;
+    }
 }
 
-export default function Map() {
-    const width = TILE_SIZE * BOARD_WIDTH;
-    const height = TILE_SIZE * BOARD_HEIGHT;
+export const getDefaultMap = (index) => {
+    if (index === 1) {
+        return new Map(
+            map1,
+            [
+                [2, 1],
+                [2, 2],
+                [2, 3],
+                [2, 4],
+                [3, 2],
 
-    return (
-        <div
-            style={{
-                position: 'absolute',
-                width: width + (TILE_SIZE * 2),
-                height: height + (TILE_SIZE * 2),
-            }}
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    width: width + (TILE_SIZE * 2),
-                    height: height + (TILE_SIZE * 2),
-                }}
-            >
-                { lineTiles(false) }
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        width,
-                    }}
-                >
-                    { lineTiles(true) }
-                    <img
-                        src={map}
-                        alt="The Map"
-                        width={width}
-                        height={height}
-                    />
-                    { lineTiles(true, true) }
-                </div>
-                { lineTiles(false, true) }
-            </div>
-        </div>
-    )
+                [6, 3],
+                [6, 4],
+                [5, 4],
+                [5, 5],
+                [4, 5],
+                [5, 6],
+                [4, 6],
+                [3, 6],
+                [3, 7],
+                [2, 7],
+
+                [6, 3],
+                [6, 4],
+                [5, 4],
+                [5, 5],
+                [4, 5],
+                [5, 6],
+                [4, 6],
+                [3, 6],
+                [3, 7],
+                [2, 7],
+
+                [8, 2],
+                [8, 3],
+                [8, 4],
+                [9, 4],
+                [10, 4],
+                [10, 5],
+                [11, 4],
+                [11, 5],
+                [11, 6],
+
+                [13, 2],
+                [13, 3],
+                [13, 4],
+                [13, 5],
+                [13, 6],
+                [13, 7],
+                [11, 8],
+                [12, 8],
+                [11, 9],
+                [12, 9],
+                [10, 10],
+                [10, 11],
+                [10, 12],
+                [9, 12],
+                [9, 13],
+
+                [2, 9],
+                [3, 9],
+                [4, 9],
+                [5, 8],
+                [5, 9],
+                [5, 10],
+                [6, 9],
+                [6, 10],
+                [7, 10],
+                [7, 11],
+                [7, 12],
+                [7, 8],
+
+                [2, 11],
+                [3, 11],
+                [3, 12],
+                [4, 12],
+                [5, 12],
+                [4, 13],
+
+                [13, 13],
+            ]
+        )
+    }
+    return null;
 }

@@ -162,25 +162,18 @@ export default function SetRoles(props) {
                 {renderTeam(gameData.team1)}
                 {renderTeam(gameData.team2)}
             </div>
-            <div
-                style={{
-                    borderStyle: 'solid',
-                    borderWidth: 2,
-                    borderRadius: 20,
-                    borderColor: '#abf',
-                    width: 80,
-                    textAlign: 'center',
-                    marginTop: 20,
-                    cursor: 'pointer',
-                }}
+            <Button
+                disabled={!gameData.team1.roles[Jobs.CAPTAIN] || !gameData.team2.roles[Jobs.CAPTAIN]}
                 onClick={() => {
                     sendMessage(
                         MessageTypes.START_GAME,
                     )
                 }}
+                variant="contained"
+                style={{ marginTop: 20 }}
             >
-                <span>Start</span>
-            </div>
+                Start
+            </Button>
         </div>
     )
 }

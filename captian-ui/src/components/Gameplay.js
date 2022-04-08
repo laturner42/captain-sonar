@@ -58,6 +58,7 @@ export default function Gameplay(props) {
                 {
                     Object.values(ScreenNames).map(screen => (
                         <div
+                            key={`swap-screen-${screen}`}
                             style={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -108,26 +109,16 @@ export default function Gameplay(props) {
                 }
             </div>
             {
-                activeScreen === ScreenNames.CAPTAIN && <Captain sendMessage={sendMessage} myTeam={myTeam} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.CAPTAIN && <Captain pauseAction={gameData.pauseAction} mapNbr={gameData.map} sendMessage={sendMessage} myTeam={myTeam} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                activeScreen === ScreenNames.NAVIGATOR && <Navigator sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.NAVIGATOR && <Navigator mapNbr={gameData.map} sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
                 activeScreen === ScreenNames.FIRSTMATE && <FirstMate sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
                 activeScreen === ScreenNames.ENGINEER && <Engineer sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
-            }
-            {
-                !!gameData.pauseAction && activeScreen === ScreenNames.CAPTAIN && (
-                     <PauseActionScreen
-                         myTeam={myTeam}
-                         enemyTeam={enemyTeam}
-                         pauseAction={gameData.pauseAction}
-                         sendMessage={sendMessage}
-                     />
-                )
             }
         </div>
     );

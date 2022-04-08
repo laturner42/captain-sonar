@@ -23,25 +23,24 @@ export default function ConfirmSelection(props) {
     const off = disabled || pending;
 
     return (
-        <div>
-            <div
-                style={{
-                    width: 100,
-                    height: 40,
-                    backgroundColor: off ? 'gray' : 'green',
-                    borderWidth: 1,
-                    borderColor: 'white',
-                    borderStyle: 'solid',
-                    borderRadius: 10,
-                    cursor: off ? undefined : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-                onClick={off ? undefined : confirmSelection}
-            >
-                <span>{text || 'Confirm'}</span>
-            </div>
+        <div
+            style={{
+                width: 100,
+                height: 40,
+                marginTop: 10,
+                backgroundColor: off ? 'gray' : 'green',
+                borderWidth: 1,
+                borderColor: 'white',
+                borderStyle: 'solid',
+                borderRadius: 10,
+                cursor: off ? undefined : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+            onClick={off ? undefined : confirmSelection}
+        >
+            <span>{text || 'Confirm'}</span>
         </div>
     )
 }

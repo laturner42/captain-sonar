@@ -34,7 +34,7 @@ export default function App() {
 
     const connect = () => {
         console.log('Connecting');
-        const ws = new WebSocket('ws://192.168.4.68:9898/');
+        const ws = new WebSocket('ws://127.0.0.1:9898/');
         ws.onopen = () => {
             console.log('Connected');
             setSocket(ws);

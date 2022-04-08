@@ -23,6 +23,7 @@ const rotations = {
 
 export const dirIcon = (direction, oStyle = {}) => (
     <div
+        key={`engineer-direction-${direction}`}
         style={{
             ...oStyle,
             display: 'flex',

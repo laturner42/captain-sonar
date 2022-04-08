@@ -9,7 +9,7 @@ export default function EnemyHistory(props) {
         <div
             style={{
                 width: '90%',
-                overflow: 'scroll',
+                overflowY: 'scroll',
                 borderWidth: 2,
                 borderStyle: 'solid',
                 borderColor: '#555',

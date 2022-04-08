@@ -9,19 +9,22 @@ import {
     Directions,
     BOARD_HEIGHT,
     BOARD_WIDTH, MAP_WIDTH, MAP_HEIGHT,
+    getBadLocations, getCurrentLoc, Jobs as ScreenNames,
 } from '../constants';
 import {
     Systems,
 } from '../components/systems';
 import map from '../components/rename.png';
 import Grid from '../components/Grid';
-import Map from '../components/Map';
+import RenderMap from '../components/RenderMap';
 import CaptainMap from '../components/toolbelt/CaptainMap';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import { convertServerPath } from '../components/Path';
 import ConfirmSelection from '../components/Confirm';
 import CaptainSystemChoice from '../components/toolbelt/CaptainSystemChoice';
 import SystemChoices from '../components/toolbelt/SystemChoices';
+import {getDefaultMap} from '../components/Map';
+import PauseActionScreen from './PauseActionScreen';
 
 export default function Captain(props) {
     const {
@@ -30,17 +33,58 @@ export default function Captain(props) {
         myTeam,
         enemyTeam,
         sendMessage,
+        mapNbr,
+        pauseAction,
     } = props;
 
     const [placementCol, setPlacementCol] = useState(myTeam.currentShipPath.startCol);
-    const [placementRow, setPlacementRow] = useState(myTeam.currentShipPath.startRow)
+    const [placementRow, setPlacementRow] = useState(myTeam.currentShipPath.startRow);
+    const [map, setMap] = useState(getDefaultMap(mapNbr));
 
     const { startSelected } = myTeam;
     const { startSelected: enemyStartSelected } = enemyTeam;
     const { pendingMove } = myTeam;
     const shipPath = convertServerPath(myTeam.currentShipPath);
+    const [
+        currentCol,
+        currentRow,
+    ] = getCurrentLoc(myTeam.currentShipPath);
 
+    const badLocations = getBadLocations(myTeam.currentShipPath, map);
+
+    const dirs = [
+        {
+            dir: Directions.North,
+            move: [0, -1],
+        },
+        {
+            dir: Directions.South,
+            move: [0, 1],
+        },
+        {
+            dir: Directions.East,
+            move: [1, 0],
+        },
+        {
+            dir: Directions.West,
+            move: [-1, 0],
+        },
+
+    ]
     const disabledDirections = [];
+    for (const badLoc of badLocations) {
+        for (const directionObj of dirs) {
+            const {
+                dir,
+                move,
+            } = directionObj;
+            if (badLoc[0] === currentCol + move[0] && badLoc[1] === currentRow + move[1]) {
+                disabledDirections.push(dir);
+                break;
+            }
+        }
+    }
+
 
     const markerSize = 20;
 
@@ -64,7 +108,7 @@ export default function Captain(props) {
         )
     }
 
-    const enableActions = !myTeam.surfaced && !pendingMove && startSelected && enemyStartSelected;
+    const enableActions = !pauseAction && !myTeam.surfaced && !pendingMove && startSelected && enemyStartSelected;
 
     return (
         <div
@@ -82,11 +126,11 @@ export default function Captain(props) {
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'row',
+                    overflow: 'hidden',
                 }}
             >
-                <Map
-                    width={width}
-                    height={height}
+                <RenderMap
+                    map={map}
                 />
                 <div
                     style={{
@@ -121,12 +165,22 @@ export default function Captain(props) {
                         )
                     }
                 </div>
+                {
+                    !!pauseAction && (
+                        <PauseActionScreen
+                            myTeam={myTeam}
+                            enemyTeam={enemyTeam}
+                            pauseAction={pauseAction}
+                            sendMessage={sendMessage}
+                        />
+                    )
+                }
             </div>
             <ToolBelt>
                 <CaptainMap active={enableActions} pendingDirection={pendingMove && pendingMove.direction} sendMessage={sendMessage} disabledDirections={disabledDirections} />
                 <SystemChoices
                     team={myTeam}
-                    enableActions={enableActions}
+                    enableActions={enableActions && !myTeam.hasFired}
                     clickable
                     sendMessage={sendMessage}
                 />
@@ -149,7 +203,7 @@ export default function Captain(props) {
                     >
                         <span>Ship</span>
                         <Button
-                            disabled={!enableActions}
+                            disabled={!enableActions || myTeam.currentShipPath.path.length === 0}
                             variant="contained"
                             style={{ margin: 5 }}
                             onClick={() => sendMessage(MessageTypes.SURFACE)}
@@ -163,11 +217,11 @@ export default function Captain(props) {
                         <span>Currently Surfaced</span>
                     )
                 }
+                <span>Ship Health: {myTeam.health}</span>
                 {
                     !startSelected &&
                         <ConfirmSelection text="Dive!" job={Jobs.CAPTAIN} sendMessage={sendMessage} />
                 }
-                <span>Ship Health: {myTeam.health}</span>
             </ToolBelt>
         </div>
     )

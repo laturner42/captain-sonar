@@ -3,22 +3,25 @@ import {
     TILE_SIZE,
 } from '../constants';
 import Grid from '../components/Grid';
-import Map from '../components/Map';
+import RenderMap from '../components/RenderMap';
 import Notes from '../components/toolbelt/Notes';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import {convertServerPath} from '../components/Path';
 import SystemChoices from '../components/toolbelt/SystemChoices';
 import EnemyHistory from '../components/toolbelt/EnemyHistory';
+import {getDefaultMap} from '../components/Map';
 
 export default function Navigator(props) {
     const {
         boardWidth,
         boardHeight,
         enemyTeam,
+        mapNbr,
     } = props;
 
     const [onCurrentPath, setOnCurrentPath] = useState(true);
     const [selectedPath, setSelectedPath] = useState(enemyTeam.currentShipPath);
+    const [map, setMap] = useState(getDefaultMap(mapNbr));
 
     const changePath = ({ target }) => {
         const { value: newPath } = target;
@@ -88,7 +91,7 @@ export default function Navigator(props) {
                     overflow: 'hidden',
                 }}
             >
-                <Map />
+                <RenderMap map={map} />
                 <Grid
                     width={shipPath.pathWidth}
                     height={shipPath.pathHeight}
@@ -132,7 +135,7 @@ export default function Navigator(props) {
                         <option value='current'>Current Path</option>
                         {
                             enemyTeam.pastShipPaths.map((p, i) => (
-                                <option value={i}>Old Path {i + 1}</option>
+                                <option value={i} key={`old-path-${i}`}>Old Path {i + 1}</option>
                             ))
                         }
                     </select>

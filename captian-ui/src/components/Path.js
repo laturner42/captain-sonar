@@ -2,7 +2,7 @@ import {
     Directions,
 } from '../constants';
 
-export default class Path {
+class Path {
     constructor(startCol, startRow, autoRecenter = false) {
         this.startCol = startCol;
         this.startRow = startRow;

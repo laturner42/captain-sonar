@@ -3,7 +3,7 @@ const {
     server: WebSocketServer,
 } = require('websocket');
 const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc } = require('../captian-ui/src/constants');
-const { Systems, DependentSubSystem } = require('../captian-ui/src/components/systems');
+const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
 const players = {};
@@ -14,6 +14,7 @@ const newTeam = (teamNbr) => {
         health: 4,
         surfaced: false,
         lastActionResult: null,
+        hasFired: false,
         roles: {
             [Jobs.CAPTAIN]: null,
             [Jobs.FIRSTMATE]: null,
@@ -23,23 +24,23 @@ const newTeam = (teamNbr) => {
         systems: {
             [Systems.Torpedo]: {
                 max: 3,
-                filled: 0,
+                filled: 3,
             },
             [Systems.Mines]: {
                 max: 3,
-                filled: 0,
+                filled: 3,
             },
             [Systems.Drone]: {
                 max: 4,
-                filled: 0,
+                filled: 4,
             },
             [Systems.Sonar]: {
                 max: 3,
-                filled: 0,
+                filled: 3,
             },
             [Systems.Silence]: {
                 max: 6,
-                filled: 0,
+                filled: 6,
             },
         },
         currentShipPath: {
@@ -61,6 +62,7 @@ const generateNewGame = () => {
         pauseAction: null,
         gameStarted: false,
         leader: null,
+        map: 1,
     };
     newGameState.team1 = newTeam(1);
     newGameState.team2 = newTeam(2);
@@ -97,15 +99,24 @@ const takeDamage = (team, amount) => {
 const takeDownSystem = (team, system) => {
     team.offlineSystems.push(system);
     const counts = {};
+    let reactorsOffline = 0;
     for (const system of team.offlineSystems) {
         if (!counts[system.subsystem]) {
             counts[system.subsystem] = 0;
         }
         counts[system.subsystem] += 1;
+        if (system.system === SubSystems.Reactor) {
+            reactorsOffline += 1;
+        }
     }
-    for (const subsystem of Object.keys(counts)) {
-        if (counts[subsystem] === 4) {
-            team.offlineSystems = team.offlineSystems.filter(system => system.subsystem !== subsystem);
+    if (reactorsOffline === 6) {
+        team.health -= 1;
+        team.offlineSystems = [];
+    } else {
+        for (const subsystem of Object.keys(counts)) {
+            if (subsystem !== 'R' && counts[subsystem] === 4) {
+                team.offlineSystems = team.offlineSystems.filter(system => system.subsystem !== subsystem);
+            }
         }
     }
 }
@@ -138,6 +149,7 @@ const parseMessage = async (packet, connection) => {
             newTeam.roles[newJob] = playerName;
             break;
         case MessageTypes.REMOVE_PLAYER:
+            if (gameState.gameStarted) break;
             const {
                 oldJob,
                 teamNbr: oldTeamNbr,
@@ -149,6 +161,7 @@ const parseMessage = async (packet, connection) => {
             gameState.gameStarted = true;
             break;
         case MessageTypes.SET_START:
+            if (myTeam.startSelected) break;
             const {
                 startCol,
                 startRow,
@@ -157,6 +170,7 @@ const parseMessage = async (packet, connection) => {
             myTeam.currentShipPath.startRow = startRow;
             break;
         case MessageTypes.HEAD:
+            if (myTeam.pendingMove) break;
             const { direction } = data;
             myTeam.pendingMove = {
                 direction,
@@ -167,6 +181,7 @@ const parseMessage = async (packet, connection) => {
                     [Jobs.NAVIGATOR]: true,
                 },
             };
+            myTeam.hasFired = false;
             myTeam.lastActionResult = null;
             break;
         case MessageTypes.SELECT_ENGINEER_SYSTEM:
@@ -205,10 +220,13 @@ const parseMessage = async (packet, connection) => {
             }
             break;
         case MessageTypes.DEPLOY_SYSTEM:
+            if (gameState.pauseAction) break;
             const {
                 system: deployedSystem,
             } = data;
+            if (myTeam.systems[deployedSystem].filled !== myTeam.systems[deployedSystem].max) break;
             myTeam.history.push(`Deploying ${deployedSystem}`);
+            myTeam.hasFired = true;
             const dependentSubsystem = DependentSubSystem[deployedSystem];
             let offline = false;
             for (const subsystem of myTeam.offlineSystems) {
@@ -228,6 +246,7 @@ const parseMessage = async (packet, connection) => {
             }
             break;
         case MessageTypes.SURFACE:
+            if (myTeam.surfaced) break;
             const [ currentCol, currentRow ] = getCurrentLoc(myTeam.currentShipPath);
             myTeam.history.push(`Surfaced in Sector ${calculateSector(currentCol, currentRow)}`);
             myTeam.surfaced = true;
@@ -246,6 +265,7 @@ const parseMessage = async (packet, connection) => {
             }, 60 * 1000);
             break;
         case MessageTypes.SCAN_SONAR:
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Sonar) break;
             const {
                 sector: chosenSector,
             } = data;
@@ -257,11 +277,12 @@ const parseMessage = async (packet, connection) => {
             gameState.pauseAction = null;
             break;
         case MessageTypes.SEND_DRONES:
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Drone) break;
             const {
                 message,
             } = data;
             enemyTeam.lastActionResult = message;
-            myTeam.systems[Systems.Drone].filled = 0;
+            enemyTeam.systems[Systems.Drone].filled = 0;
             gameState.pauseAction = null;
             break;
         default:

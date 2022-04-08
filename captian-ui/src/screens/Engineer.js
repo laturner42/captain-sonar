@@ -64,7 +64,7 @@ export default function Navigator(props) {
             [Directions.East]: [SubSystems.Flee],
         },
         {
-            name: 'S',
+            name: 'R',
             [Directions.West]: [SubSystems.Search, SubSystems.Reactor, SubSystems.Reactor],
             [Directions.North]: [SubSystems.Search, SubSystems.Weapons, SubSystems.Reactor],
             [Directions.South]: [SubSystems.Weapons, SubSystems.Reactor, SubSystems.Flee],
@@ -120,6 +120,7 @@ export default function Navigator(props) {
                         subsystems.map((subsystem) => {
                             const boxes = [
                                 <div
+                                    key="subsystem-title-blank"
                                     style={{
                                         margin: 5,
                                         marginLeft: 10,
@@ -133,6 +134,7 @@ export default function Navigator(props) {
                                 const subsystemOrder = subsystem[direction] ?? [];
                                 boxes.push(
                                     <div
+                                        key={`subsystem-title-${subsystem.name}-${direction}`}
                                         style={{
                                             height: iconSize * 2.6,
                                             borderLeftWidth: 1,
@@ -209,6 +211,7 @@ export default function Navigator(props) {
                             }
                             return (
                                 <div
+                                    key={`subsystem-${subsystem.name}`}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'row',
@@ -216,7 +219,7 @@ export default function Navigator(props) {
                                         alignItems: 'center',
                                         borderWidth: 2,
                                         borderStyle: 'solid',
-                                        borderColor: subsystem.name !== 'S' ? '#888' : 'rgba(255,255,255,0.1)',
+                                        borderColor: subsystem.name !== 'R' ? '#888' : 'rgba(255,255,255,0.1)',
                                         borderRadius: 4,
                                         margin: 5,
                                     }}
@@ -247,11 +250,7 @@ export default function Navigator(props) {
                 <Notes />
                 {
                     !!pendingMove && (
-                        <div>
-                            <span>The Captain has set heading:</span>
-                            {dirIcon(pendingMove.direction)}
-                            <ConfirmSelection disabled={!pendingMove.engineerSelection || pendingMove.confirmed[Jobs.ENGINEER]} job={Jobs.ENGINEER} sendMessage={sendMessage} />
-                        </div>
+                        <ConfirmSelection disabled={!pendingMove.engineerSelection || pendingMove.confirmed[Jobs.ENGINEER]} job={Jobs.ENGINEER} sendMessage={sendMessage} />
                     )
                 }
             </ToolBelt>

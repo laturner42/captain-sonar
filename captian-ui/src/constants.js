@@ -61,19 +61,45 @@ const TILE_SIZE = 30;
 const BOARD_WIDTH = 15;
 const BOARD_HEIGHT = 15;
 
+const getBadLocations = (currentPath, map) => {
+    const {
+        startCol,
+        startRow,
+        path,
+    } = currentPath;
+    let currentCol = startCol;
+    let currentRow = startRow;
+    const badLocs = [...map.islandLocs, [currentCol, currentRow]];
+
+    const moves = {
+        [Directions.North]: [0, -1],
+        [Directions.South]: [0, 1],
+        [Directions.East]: [1, 0],
+        [Directions.West]: [-1, 0],
+    };
+    for (const direction of path) {
+        const move = moves[direction]
+        currentCol += move[0];
+        currentRow += move[1];
+        badLocs.push([ currentCol, currentRow ]);
+    }
+    return badLocs;
+}
+
 const getCurrentLoc = (currentPath) => {
     const {
         startCol,
         startRow,
         path,
     } = currentPath;
+    const moves = {
+        [Directions.North]: [0, -1],
+        [Directions.South]: [0, 1],
+        [Directions.East]: [1, 0],
+        [Directions.West]: [-1, 0],
+    }
     return path.reduce((currentLoc, direction) => {
-        const move = {
-            [Directions.North]: [0, -1],
-            [Directions.South]: [0, 1],
-            [Directions.East]: [1, 0],
-            [Directions.West]: [-1, 0],
-        }[direction];
+        const move = moves[direction];
         return [
             currentLoc[0] + move[0],
             currentLoc[1] + move[1],
@@ -98,6 +124,7 @@ module.exports = {
     Directions,
     getCurrentLoc,
     calculateSector,
+    getBadLocations,
     getTeams,
     getMyRole,
     TOOL_BELT_WIDTH: 200,
