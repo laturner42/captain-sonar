@@ -32,7 +32,6 @@ export default function Navigator(props) {
             setOnCurrentPath(false);
             const index = parseInt(`${newPath}`, 10);
             const newTrackPath = enemyTeam.pastShipPaths[index];
-            console.log(newTrackPath);
             setSelectedPath(newTrackPath);
         }
     }
@@ -97,7 +96,7 @@ export default function Navigator(props) {
                     height={shipPath.pathHeight}
                     path={shipPath}
                     boardMargin={1}
-                    lineColor="black"
+                    lineColor={enemyTeam.surfaced || !onCurrentPath ? '#a17f1a' : '#222'}
                     manualOffsetX={offsetCoords[0]}
                     manualOffsetY={offsetCoords[1]}
                     onMouseDown={dragStart}
@@ -115,7 +114,7 @@ export default function Navigator(props) {
                     removeOutlines
                 />
                 <EnemyHistory
-                    enemyTeam={enemyTeam}
+                    team={enemyTeam}
                 />
                 <div
                     style={{

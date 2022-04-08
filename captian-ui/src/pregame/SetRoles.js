@@ -49,6 +49,7 @@ export default function SetRoles(props) {
         }
         return (
             <div
+                key={`pbutton-${playerName ? playerName : `{teamNbr}-${job}`}`}
                 style={{
                     height: 30,
                     borderWidth: 2,
@@ -149,7 +150,7 @@ export default function SetRoles(props) {
                     Object.values(gameData.players)
                         .map(player => player.name)
                         .filter(playerName => !placedRoles.includes(playerName))
-                        .map(playerButton)
+                        .map((playerName) => playerButton(playerName))
                 }
             </div>
             <div

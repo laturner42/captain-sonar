@@ -2,7 +2,7 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters } = require('../captian-ui/src/constants');
 const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
@@ -181,8 +181,9 @@ const parseMessage = async (packet, connection) => {
                     [Jobs.NAVIGATOR]: true,
                 },
             };
-            myTeam.hasFired = false;
-            myTeam.lastActionResult = null;
+            break;
+        case MessageTypes.UNDO_HEAD:
+            myTeam.pendingMove = null;
             break;
         case MessageTypes.SELECT_ENGINEER_SYSTEM:
             if (!myTeam.pendingMove) break;
@@ -201,6 +202,10 @@ const parseMessage = async (packet, connection) => {
                 break;
             }
             if (!myTeam.pendingMove) break;
+            if (job === Jobs.CAPTAIN) {
+                myTeam.pendingMove = null;
+                break;
+            }
             myTeam.pendingMove.confirmed[job] = true;
             const {
                 [Jobs.ENGINEER]: engineerConfirmed,
@@ -211,11 +216,13 @@ const parseMessage = async (packet, connection) => {
                 myTeam.currentShipPath.path.push(myTeam.pendingMove.direction);
                 takeDownSystem(myTeam, myTeam.pendingMove.engineerSelection);
                 const filledSystem = myTeam.systems[firstmateSelection];
-                filledSystem.filled += 1;
+                filledSystem.filled = Math.min(filledSystem.max, filledSystem.filled + 1);
                 myTeam.history.push(`Head ${myTeam.pendingMove.direction}`);
                 if (filledSystem.filled === filledSystem.max) {
                     myTeam.history.push(`${firstmateSelection} Ready`);
                 }
+                myTeam.hasFired = false;
+                myTeam.lastActionResult = null;
                 myTeam.pendingMove = null;
             }
             break;
@@ -225,7 +232,6 @@ const parseMessage = async (packet, connection) => {
                 system: deployedSystem,
             } = data;
             if (myTeam.systems[deployedSystem].filled !== myTeam.systems[deployedSystem].max) break;
-            myTeam.history.push(`Deploying ${deployedSystem}`);
             myTeam.hasFired = true;
             const dependentSubsystem = DependentSubSystem[deployedSystem];
             let offline = false;
@@ -236,11 +242,13 @@ const parseMessage = async (packet, connection) => {
                 }
             }
             if (!offline) {
+                myTeam.history.push(`Deployed ${deployedSystem}`);
                 gameState.pauseAction = {
                     teamNbr: myTeam.teamNbr,
                     system: deployedSystem,
                 };
             } else {
+                myTeam.history.push(`Attempted to Deploy ${deployedSystem}`);
                 myTeam.systems[deployedSystem].filled -= 1;
                 takeDamage(myTeam, 1);
             }
@@ -283,6 +291,32 @@ const parseMessage = async (packet, connection) => {
             } = data;
             enemyTeam.lastActionResult = message;
             enemyTeam.systems[Systems.Drone].filled = 0;
+            gameState.pauseAction = null;
+            break;
+        case MessageTypes.LAUNCH_TORPEDO:
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Torpedo) break;
+            const {
+                col: attackCol,
+                row: attackRow,
+            } = data;
+            const [ currentSelfCol, currentSelfRow ] = getCurrentLoc(myTeam.currentShipPath);
+            const [ currentEnemyCol, currentEnemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
+            if (currentSelfCol === attackCol && currentSelfRow === attackRow) {
+                takeDamage(myTeam, 2);
+            } else if (Math.abs(currentSelfCol - attackCol) <= 1 && Math.abs(currentSelfRow - attackRow) <= 1) {
+                takeDamage(myTeam, 1);
+            }
+            if (currentEnemyCol === attackCol && currentEnemyRow === attackRow) {
+                takeDamage(enemyTeam, 2);
+                myTeam.lastActionResult = 'The Enemy ship took 2 damage.';
+            } else if (Math.abs(currentEnemyCol - attackCol) <= 1 && Math.abs(currentEnemyRow - attackRow) <= 1) {
+                takeDamage(enemyTeam, 1);
+                myTeam.lastActionResult = 'The Enemy ship took 1 damage.';
+            } else {
+                myTeam.lastActionResult = 'The Torpedo missed the Enemy ship.';
+            }
+            myTeam.history.push(`Fired Torpedo at ${letters[attackCol]}${attackRow + 1}`);
+            myTeam.systems[Systems.Torpedo].filled = 0;
             gameState.pauseAction = null;
             break;
         default:

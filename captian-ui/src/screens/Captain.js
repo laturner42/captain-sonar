@@ -3,6 +3,10 @@ import {
     Button,
 } from '@mui/material';
 import {
+    Favorite as Heart,
+    FavoriteBorder as EmptyHeart,
+} from '@mui/icons-material';
+import {
     Jobs,
     MessageTypes,
     TILE_SIZE,
@@ -172,6 +176,8 @@ export default function Captain(props) {
                             enemyTeam={enemyTeam}
                             pauseAction={pauseAction}
                             sendMessage={sendMessage}
+                            map={map}
+                            disabledDirections={disabledDirections}
                         />
                     )
                 }
@@ -202,10 +208,21 @@ export default function Captain(props) {
                         }}
                     >
                         <span>Ship</span>
+                        <div>
+                            {
+                                [1,2,3,4].map((health) => {
+                                    if (health <= myTeam.health) {
+                                        return <Heart style={{ color: 'pink' }} />
+                                    } else {
+                                        return <EmptyHeart style={{ color: 'gray' }} />
+                                    }
+                                })
+                            }
+                        </div>
                         <Button
                             disabled={!enableActions || myTeam.currentShipPath.path.length === 0}
                             variant="contained"
-                            style={{ margin: 5 }}
+                            style={{ marginBottom: 5 }}
                             onClick={() => sendMessage(MessageTypes.SURFACE)}
                         >
                             Surface
@@ -217,10 +234,9 @@ export default function Captain(props) {
                         <span>Currently Surfaced</span>
                     )
                 }
-                <span>Ship Health: {myTeam.health}</span>
                 {
-                    !startSelected &&
-                        <ConfirmSelection text="Dive!" job={Jobs.CAPTAIN} sendMessage={sendMessage} />
+                    (!startSelected || !!pendingMove) &&
+                        <ConfirmSelection text={pendingMove ? 'Undo' : 'Dive!'} job={Jobs.CAPTAIN} sendMessage={sendMessage} />
                 }
             </ToolBelt>
         </div>

@@ -17,6 +17,7 @@ const MessageTypes = {
     BE_QUIET: 15,
 
     SURFACE: 16,
+    UNDO_HEAD: 17,
 };
 
 const Jobs = {
@@ -118,10 +119,13 @@ const calculateSector = (col, row) => {
     return sectors[sectorCol][sectorRow];
 }
 
+const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
+
 module.exports = {
     Jobs,
     MessageTypes,
     Directions,
+    letters,
     getCurrentLoc,
     calculateSector,
     getBadLocations,

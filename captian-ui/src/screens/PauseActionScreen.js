@@ -5,6 +5,7 @@ import {
 import {Systems} from '../components/systems';
 import SonarAction from '../components/actions/SonarAction';
 import DroneAction from '../components/actions/DroneAction';
+import TorpedoAction from '../components/actions/TorpedoAction';
 
 export default function PauseActionScreen(props) {
     const {
@@ -12,6 +13,7 @@ export default function PauseActionScreen(props) {
         enemyTeam,
         pauseAction,
         sendMessage,
+        map,
     } = props;
 
     const {
@@ -75,10 +77,12 @@ export default function PauseActionScreen(props) {
             <div
                 style={{
                     margin: 10,
+                    height: '100%',
                 }}
             >
                 { system === Systems.Sonar && <SonarAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
                 { system === Systems.Drone && <DroneAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
+                { system === Systems.Torpedo && <TorpedoAction map={map} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
             </div>
         </div>
     )

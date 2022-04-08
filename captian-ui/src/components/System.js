@@ -21,7 +21,7 @@ export default function System(props) {
     const { filled, max } = systems[system];
 
     const selected = !!pendingMove && pendingMove.firstmateSelection === system;
-    const disabled = !pendingMove || pendingMove.confirmed[Jobs.FIRSTMATE] || filled === max;
+    const disabled = !pendingMove || pendingMove.confirmed[Jobs.FIRSTMATE]; // || filled === max;
 
     const systemSize = 75;
 
@@ -74,7 +74,8 @@ export default function System(props) {
                     width: systemSize,
                     height: systemSize,
                     borderStyle: 'solid',
-                    borderColor: selected ? 'black' : 'white',
+                    borderColor: selected ? 'cyan' : 'white',
+                    color: selected ? 'cyan' : 'white',
                     borderWidth: 3,
                     backgroundColor: SystemColors[system],
                     borderRadius: systemSize,

@@ -1,7 +1,6 @@
-import { TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT } from '../constants';
+import { TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, letters } from '../constants';
 
 const numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
-export const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
 
 const lineTiles = (horizontal, dim = false) => {
     const values = horizontal ? letters : numbers;

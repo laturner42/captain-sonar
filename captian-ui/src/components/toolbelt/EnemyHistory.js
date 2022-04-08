@@ -1,9 +1,10 @@
 export default function EnemyHistory(props) {
     const {
-        enemyTeam,
+        isEnemy,
+        team,
     } = props;
 
-    const history = [...enemyTeam.history].reverse();
+    const history = [...team.history].reverse();
 
     return (
         <div
@@ -28,11 +29,12 @@ export default function EnemyHistory(props) {
                     borderBottomStyle: 'solid',
                 }}
             >
-                <span>Enemy History</span>
+                <span>{isEnemy ? 'Enemy ' : ''}History</span>
             </div>
             {
                 history.map((event, i) => (
                     <div
+                        key={`history-${history.length - i}`}
                         style={{
                             color: i === 0 ? 'white' : '#aaa',
                             fontSize: 12,

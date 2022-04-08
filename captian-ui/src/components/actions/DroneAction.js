@@ -3,10 +3,7 @@ import {
     Button,
     TextField,
 } from '@mui/material';
-import {calculateSector, getCurrentLoc, MessageTypes} from '../../constants';
-import {
-    letters,
-} from '../RenderMap';
+import {calculateSector, getCurrentLoc, MessageTypes, letters } from '../../constants';
 
 export default function DroneAction(props) {
     const {
@@ -23,7 +20,7 @@ export default function DroneAction(props) {
     const [selectedRow, setSelectedRow] = useState(null);
 
     const [lieInfo, setLieInfo] = useState('');
-    const [lieValue, setLieValue] = useState(null);
+    const [lieValue, setLieValue] = useState('');
 
     if (isMyAction) {
         return (
@@ -68,22 +65,20 @@ export default function DroneAction(props) {
         else if (lieInfo === 'col') sendingCol = lieValue;
         else if (lieInfo === 'row') sendingRow = lieValue;
 
-        console.log(lieInfo, lieValue);
-
         let message = 'The Drone reported';
         if (sendingSector) {
-            message += ` Sector ${sendingSector}`
+            message += ` Sector ${sendingSector},`
         }
         if (sendingCol) {
-            message += ` Column ${sendingCol}`
+            message += ` Column ${sendingCol},`
         }
         if (sendingRow) {
-            message += ` Row ${sendingRow}`
+            message += ` Row ${sendingRow},`
         }
         sendMessage(
             MessageTypes.SEND_DRONES,
             {
-                message,
+                message: message.replace(/,$/, '.'),
             }
         )
     }
@@ -98,7 +93,7 @@ export default function DroneAction(props) {
                 height: '100%',
             }}
         >
-            <div style={{ marginLeft: 10, marginRight: 10, width: '100%', textAlign: 'center', }} ><span>You've managed to hack into an Enemy Drone.</span></div>
+            <div style={{ marginLeft: 10, marginRight: 10, width: '100%', textAlign: 'center', }} ><span>You've managed to hack into the Enemy Drone.</span></div>
             <div
                 style={{
                     display: 'flex',
@@ -110,7 +105,7 @@ export default function DroneAction(props) {
                         width: 260,
                     }}
                 >
-                    <span>Select which location detail the Drone will report accurately.</span>
+                    <span>Select which location detail the Drone will report <span style={{ fontWeight: 'bold', color: '#060' }}>accurately.</span></span>
                 </div>
                 <div
                     style={{ width: 120, height: 40, display: 'flex' }}
@@ -136,7 +131,7 @@ export default function DroneAction(props) {
                         width: 260,
                     }}
                 >
-                    <span>Now select which location detail the Drone will report inaccurately.</span>
+                    <span>Select which location detail the Drone will report <span style={{ fontWeight: 'bold', color: '#600' }}>inaccurately.</span></span>
                 </div>
                 <div
                     style={{ width: 120, height: 40, display: 'flex' }}

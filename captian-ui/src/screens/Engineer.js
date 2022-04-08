@@ -173,7 +173,7 @@ export default function Navigator(props) {
                                                         && engineerSelection.subsystem === subsystem.name;
                                                 }
 
-                                                let color = selected ? 'black' : 'white';
+                                                let color = selected ? 'cyan' : 'white';
                                                 const selectable = awaitingSelection && direction === pendingMove.direction;
                                                 if (awaitingSelection && !selectable) {
                                                     color = '#ddd';

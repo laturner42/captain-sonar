@@ -9,6 +9,7 @@ import ToolBelt from '../components/toolbelt/ToolBelt';
 import Notes from '../components/toolbelt/Notes';
 import System from '../components/System';
 import ConfirmSelection from '../components/Confirm';
+import EnemyHistory from '../components/toolbelt/EnemyHistory';
 
 export default function Navigator(props) {
     const {
@@ -47,6 +48,7 @@ export default function Navigator(props) {
                     borderRadius: 5,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     flexDirection: 'column',
                 }}
             >
@@ -101,16 +103,23 @@ export default function Navigator(props) {
                     <span>Every movement, pick a System to charge.</span>
                     <span>Once a system is fully charged, it can be Deployed by the Captain.</span>
                 </div>
-                <span
-                    style={{ color: 'cyan' }}
+                <div
+                    style={{ marginTop: 20, height: 20 }}
                 >
-                    {myTeam.lastActionResult || ''}
-                </span>
+                    <span
+                        style={{ color: 'cyan' }}
+                    >
+                        {myTeam.lastActionResult || ''}
+                    </span>
+                </div>
             </div>
             <ToolBelt
                 height={height}
             >
                 <Notes />
+                <EnemyHistory
+                    team={myTeam}
+                />
                 {
                     !!pendingMove && (
                         <ConfirmSelection disabled={!pendingMove.firstmateSelection || pendingMove.confirmed[Jobs.FIRSTMATE]} job={Jobs.FIRSTMATE} sendMessage={sendMessage} />

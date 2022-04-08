@@ -7,8 +7,8 @@ import {
 } from './constants';
 
 import Gameplay from './components/Gameplay';
-import Join from './screens/Join';
-import SetRoles from './screens/SetRoles';
+import Join from './pregame/Join';
+import SetRoles from './pregame/SetRoles';
 
 export default function App() {
     const [socket, setSocket] = useState(null);
