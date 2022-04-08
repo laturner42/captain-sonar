@@ -120,7 +120,7 @@ export default function Gameplay(props) {
                 activeScreen === ScreenNames.ENGINEER && <Engineer sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                !!gameData.pauseAction && (
+                !!gameData.pauseAction && activeScreen === ScreenNames.CAPTAIN && (
                      <PauseActionScreen
                          myTeam={myTeam}
                          enemyTeam={enemyTeam}

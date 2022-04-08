@@ -37,7 +37,7 @@ export default function SonarAction(props) {
             >
                 {
                     [1,2,3,4,5,6,7,8,9].map((sector) => (
-                        <option value={sector}>Sector ${sector}</option>
+                        <option value={sector}>Sector {sector}</option>
                     ))
                 }
             </select>

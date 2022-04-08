@@ -1,5 +1,8 @@
 import {SystemColors, Systems} from '../systems';
 import {SystemIcons} from '../SystemIcons';
+import {
+    MessageTypes,
+} from '../../constants';
 
 export default function CaptainSystemChoice(props) {
     const {
@@ -8,6 +11,7 @@ export default function CaptainSystemChoice(props) {
         disabled,
         clickable,
         removeOutline,
+        sendMessage,
     } = props;
 
     const systemSize = 40;
@@ -20,6 +24,15 @@ export default function CaptainSystemChoice(props) {
         [Systems.Sonar]: 'Ask the enemy if they are in a particular Sector',
         [Systems.Drone]: 'Get two pieces of info from the enemy - only one is true',
         [Systems.Silence]: 'Move up to 4 spaces in a single direction without detection',
+    }
+
+    const trigger = () => {
+        sendMessage(
+            MessageTypes.DEPLOY_SYSTEM,
+            {
+                system,
+            }
+        )
     }
 
     return (
@@ -40,6 +53,7 @@ export default function CaptainSystemChoice(props) {
                 margin: 5,
                 cursor: active && clickable ? 'pointer' : 'not-allowed',
             }}
+            onClick={active && clickable ? trigger : undefined}
             title={titles[system]}
         >
             {SystemIcons[system]}

@@ -17,7 +17,7 @@ export default function Join(props) {
 
     const changeName = ({ target }) => {
         let { value: newName } = target;
-        setMyName(newName);
+        setMyName(newName.slice(0, 12));
     }
 
     const startJoin = () => {

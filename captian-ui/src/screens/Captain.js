@@ -64,7 +64,7 @@ export default function Captain(props) {
         )
     }
 
-    const enableActions = !pendingMove && startSelected && enemyStartSelected;
+    const enableActions = !myTeam.surfaced && !pendingMove && startSelected && enemyStartSelected;
 
     return (
         <div
@@ -128,6 +128,7 @@ export default function Captain(props) {
                     team={myTeam}
                     enableActions={enableActions}
                     clickable
+                    sendMessage={sendMessage}
                 />
                 <div
                     style={{
@@ -166,6 +167,7 @@ export default function Captain(props) {
                     !startSelected &&
                         <ConfirmSelection text="Dive!" job={Jobs.CAPTAIN} sendMessage={sendMessage} />
                 }
+                <span>Ship Health: {myTeam.health}</span>
             </ToolBelt>
         </div>
     )

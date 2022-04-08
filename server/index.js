@@ -2,8 +2,8 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, DependentSubSystem, calculateSector, getCurrentLoc } = require('../captian-ui/src/constants');
-const { Systems } = require('../captian-ui/src/components/systems');
+const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc } = require('../captian-ui/src/constants');
+const { Systems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
 const players = {};
@@ -242,6 +242,7 @@ const parseMessage = async (packet, connection) => {
                     path: [],
                 };
                 myTeam.surfaced = false;
+                updateEveryone();
             }, 60 * 1000);
             break;
         case MessageTypes.SCAN_SONAR:
@@ -250,8 +251,9 @@ const parseMessage = async (packet, connection) => {
             } = data;
             const [ enemyCol, enemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
             const actualSector = calculateSector(enemyCol, enemyRow);
-            myTeam.lastActionResult = `The Enemy is ${actualSector === chosenSector ? '' : 'not '}in Sector ${actualSector}`;
+            myTeam.lastActionResult = `The Enemy is ${actualSector === chosenSector ? '' : 'not '}in Sector ${chosenSector}`;
             myTeam.history.push(`Guessed Sector ${chosenSector}`);
+            myTeam.systems[Systems.Sonar].filled = 0;
             gameState.pauseAction = null;
             break;
         case MessageTypes.SEND_DRONES:
@@ -259,6 +261,7 @@ const parseMessage = async (packet, connection) => {
                 message,
             } = data;
             enemyTeam.lastActionResult = message;
+            myTeam.systems[Systems.Drone].filled = 0;
             gameState.pauseAction = null;
             break;
         default:

@@ -8,6 +8,7 @@ export default function SystemChoices(props) {
         team,
         clickable,
         removeOutlines,
+        sendMessage,
     } = props;
 
     return (
@@ -42,6 +43,7 @@ export default function SystemChoices(props) {
                             disabled={!enableActions}
                             clickable={clickable}
                             removeOutline={removeOutlines}
+                            sendMessage={sendMessage}
                         />
                         <CaptainSystemChoice
                             system={Systems.Mines}
@@ -49,6 +51,7 @@ export default function SystemChoices(props) {
                             disabled={!enableActions}
                             clickable={clickable}
                             removeOutline={removeOutlines}
+                            sendMessage={sendMessage}
                         />
                     </div>
                     <div>
@@ -58,6 +61,7 @@ export default function SystemChoices(props) {
                             disabled={!enableActions}
                             clickable={clickable}
                             removeOutline={removeOutlines}
+                            sendMessage={sendMessage}
                         />
                         <CaptainSystemChoice
                             system={Systems.Sonar}
@@ -65,6 +69,7 @@ export default function SystemChoices(props) {
                             disabled={!enableActions}
                             clickable={clickable}
                             removeOutline={removeOutlines}
+                            sendMessage={sendMessage}
                         />
                     </div>
                     <CaptainSystemChoice
@@ -73,6 +78,7 @@ export default function SystemChoices(props) {
                         disabled={!enableActions}
                         clickable={clickable}
                         removeOutline={removeOutlines}
+                        sendMessage={sendMessage}
                     />
                 </div>
             </div>

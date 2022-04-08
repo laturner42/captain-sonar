@@ -17,18 +17,24 @@ export default function Navigator(props) {
         enemyTeam,
     } = props;
 
+    const [onCurrentPath, setOnCurrentPath] = useState(true);
     const [selectedPath, setSelectedPath] = useState(enemyTeam.currentShipPath);
 
-    const changePath = (newPath) => {
+    const changePath = ({ target }) => {
+        const { value: newPath } = target;
         if (newPath === 'current') {
+            setOnCurrentPath(true)
             setSelectedPath(enemyTeam.currentShipPath);
         } else {
+            setOnCurrentPath(false);
             const index = parseInt(`${newPath}`, 10);
-            setSelectedPath(enemyTeam.pastShipPaths[index]);
+            const newTrackPath = enemyTeam.pastShipPaths[index];
+            console.log(newTrackPath);
+            setSelectedPath(newTrackPath);
         }
     }
 
-    const shipPath = convertServerPath(selectedPath, true);
+    const shipPath = convertServerPath(onCurrentPath ? enemyTeam.currentShipPath : selectedPath, true);
 
     const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
     const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
@@ -123,12 +129,12 @@ export default function Navigator(props) {
                             marginTop: 2,
                         }}
                     >
+                        <option value='current'>Current Path</option>
                         {
                             enemyTeam.pastShipPaths.map((p, i) => (
                                 <option value={i}>Old Path {i + 1}</option>
                             ))
                         }
-                        <option value='current'>Current Path</option>
                     </select>
                 </div>
             </ToolBelt>
