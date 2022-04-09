@@ -126,7 +126,7 @@ export default function Grid(props) {
         )
     }
 
-    const gridColor = onMouseMove ? 'rgba(255, 255, 255, 0.2)' : '#ccc';
+    const gridColor =`rgba(255, 255, 255, 0.2)`;
     return (
         <div
             style={{

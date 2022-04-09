@@ -24,23 +24,23 @@ const newTeam = (teamNbr) => {
         systems: {
             [Systems.Torpedo]: {
                 max: 3,
-                filled: 3,
+                filled: 0,
             },
             [Systems.Mine]: {
                 max: 3,
-                filled: 3,
+                filled: 0,
             },
             [Systems.Drone]: {
                 max: 4,
-                filled: 4,
+                filled: 0,
             },
             [Systems.Sonar]: {
                 max: 3,
-                filled: 3,
+                filled: 0,
             },
             [Systems.Silence]: {
                 max: 6,
-                filled: 6,
+                filled: 0,
             },
         },
         currentShipPath: {
