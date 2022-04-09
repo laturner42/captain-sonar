@@ -3,17 +3,16 @@ import {
     Button,
 } from '@mui/material';
 import {
-    Navigation as Arrow,
     MyLocation as Compass,
 } from '@mui/icons-material';
-import {letters, getCurrentLoc, MessageTypes, TILE_SIZE} from '../../constants';
+import { letters, getCurrentLoc, MessageTypes, TILE_SIZE } from '../../constants';
 
-export default function TorpedoAction(props) {
+export default function MinesAction(props) {
     const {
         isMyAction,
         sendMessage,
         myTeam,
-        map,
+        possibleMineLocations,
     } = props;
 
     const [selectedLoc, setSelectedLoc] = useState([]);
@@ -21,7 +20,7 @@ export default function TorpedoAction(props) {
     if (!isMyAction) {
         return (
             <div style={{ fontSize: 20, textAlign: 'center', marginTop: 40 }}>
-                <span>The Enemy is deploying a torpedo.</span>
+                <span>The Enemy is deploying a Mine.</span>
                 <div style={{ marginTop: 10 }}>
                     <span>Hold on tight!</span>
                 </div>
@@ -36,7 +35,7 @@ export default function TorpedoAction(props) {
 
     const lockItIn = () => {
         sendMessage(
-            MessageTypes.LAUNCH_TORPEDO,
+            MessageTypes.PLACE_MINE,
             {
                 col: selectedLoc[0],
                 row: selectedLoc[1],
@@ -46,27 +45,30 @@ export default function TorpedoAction(props) {
 
     const spaces = [];
 
-    for (let r=-4; r<=4; r++) {
+
+
+    for (let r=-1; r<=1; r++) {
         const line = [];
-        for (let c=-4; c<=4; c++) {
+        for (let c=-1; c<=1; c++) {
             const col = currentCol + c;
             const row = currentRow + r;
-            let active = Math.abs(Math.abs(c) + Math.abs(r)) <= 4;
-            for (const island of map.islandLocs) {
-                if (col === island[0] && row === island[1]) {
-                    active = false;
+            let active = false;
+            for (const loc of possibleMineLocations) {
+                if (col === loc[0] && row === loc[1]) {
+                    active = true;
                     break;
                 }
             }
             const selected = col === selectedLoc[0] && row === selectedLoc[1];
+            const center = c === 0 && r === 0;
             line.push(
                 <div
-                    key={`torpedo-tile-${col}${row}`}
+                    key={`mine-tile-${col}${row}`}
                     style={{
                         width: TILE_SIZE,
                         height: TILE_SIZE,
                         margin: 1,
-                        backgroundColor: active ? (selected ? 'red' : '#6af') : undefined,
+                        backgroundColor: (active || center) ? (selected ? 'red' : '#6af') : undefined,
                         borderWidth: 1,
                         color: 'white',
                         fontSize: 12,
@@ -78,7 +80,7 @@ export default function TorpedoAction(props) {
                     onClick={active ? () => setSelectedLoc([col, row]) : null}
                 >
                     {
-                        c === 0 && r === 0 ?
+                        center ?
                             <Compass style={{ fontSize: 18 }} /> :
                             active ? `${letters[col]}${row + 1}` : ''
                     }
@@ -99,15 +101,22 @@ export default function TorpedoAction(props) {
         >
             <div
                 style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
                     margin: 10,
                     marginTop: -5,
+                    height: 50,
                 }}
             >
-                <span>Select the Column and Row to fire a Torpedo at.</span>
+                <span>Select the Column and Row to place a Mine at.</span>
+                <span>You can trigger this mine manually later.</span>
             </div>
             <div
                 style={{
                     display: 'flex',
+                    justifyContent: 'center',
+                    marginTop: 20,
                 }}
             >
                 <div
@@ -133,7 +142,7 @@ export default function TorpedoAction(props) {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '100%',
+                        marginLeft: 40,
                     }}
                 >
                     <Button
@@ -144,7 +153,7 @@ export default function TorpedoAction(props) {
                             margin: 20,
                         }}
                     >
-                        Fire!
+                        Lock In
                     </Button>
                 </div>
             </div>

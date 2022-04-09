@@ -80,7 +80,6 @@ export const getDefaultMap = (index) => {
                 [7, 10],
                 [7, 11],
                 [7, 12],
-                [7, 13],
 
                 [2, 11],
                 [3, 11],

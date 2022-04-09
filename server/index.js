@@ -53,6 +53,7 @@ const newTeam = (teamNbr) => {
         offlineSystems: [],
         pendingMove: null,
         pastShipPaths: [],
+        mines: [],
     };
 }
 
@@ -119,6 +120,30 @@ const takeDownSystem = (team, system) => {
             }
         }
     }
+}
+
+const triggerAttack = (myTeam, enemyTeam, attackCol, attackRow, system) => {
+    const [ currentSelfCol, currentSelfRow ] = getCurrentLoc(myTeam.currentShipPath);
+    const [ currentEnemyCol, currentEnemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
+    myTeam.history.push(`${system === Systems.Torpedo ? 'Fired' : 'Triggered'} ${system} at ${letters[attackCol]}${attackRow + 1}`);
+    if (currentSelfCol === attackCol && currentSelfRow === attackRow) {
+        takeDamage(myTeam, 2);
+    } else if (Math.abs(currentSelfCol - attackCol) <= 1 && Math.abs(currentSelfRow - attackRow) <= 1) {
+        takeDamage(myTeam, 1);
+    }
+    if (currentEnemyCol === attackCol && currentEnemyRow === attackRow) {
+        takeDamage(enemyTeam, 2);
+        myTeam.lastActionResult = 'The Enemy ship took 2 damage.';
+    } else if (Math.abs(currentEnemyCol - attackCol) <= 1 && Math.abs(currentEnemyRow - attackRow) <= 1) {
+        takeDamage(enemyTeam, 1);
+        myTeam.lastActionResult = 'The Enemy ship took 1 damage.';
+    } else {
+        myTeam.lastActionResult = `The ${Systems.Mines} missed the Enemy ship.`;
+    }
+    if (system === Systems.Torpedo) {
+        myTeam.systems[Systems.Torpedo].filled = 0;
+    }
+    gameState.pauseAction = null;
 }
 
 const parseMessage = async (packet, connection) => {
@@ -293,31 +318,45 @@ const parseMessage = async (packet, connection) => {
             enemyTeam.systems[Systems.Drone].filled = 0;
             gameState.pauseAction = null;
             break;
+        case MessageTypes.PLACE_MINE:
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Mines) break;
+            const {
+                col: mineCol,
+                row: mineRow,
+            } = data;
+            myTeam.lastActionResult = `Mine placed at ${letters[mineCol]}${mineRow + 1}.`;
+            myTeam.mines.push([mineCol, mineRow]);
+            myTeam.systems[Systems.Mines].filled = 0;
+            myTeam.history.push('Placed Mine');
+            gameState.pauseAction = null;
+            break;
         case MessageTypes.LAUNCH_TORPEDO:
             if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Torpedo) break;
             const {
-                col: attackCol,
-                row: attackRow,
+                col: torpedoCol,
+                row: torpedoRow,
             } = data;
-            const [ currentSelfCol, currentSelfRow ] = getCurrentLoc(myTeam.currentShipPath);
-            const [ currentEnemyCol, currentEnemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
-            if (currentSelfCol === attackCol && currentSelfRow === attackRow) {
-                takeDamage(myTeam, 2);
-            } else if (Math.abs(currentSelfCol - attackCol) <= 1 && Math.abs(currentSelfRow - attackRow) <= 1) {
-                takeDamage(myTeam, 1);
+            triggerAttack(myTeam, enemyTeam, torpedoCol, torpedoRow, Systems.Torpedo)
+            break;
+        case MessageTypes.TRIGGER_MINE:
+            const {
+                col: triggerMineCol,
+                row: triggerMineRow,
+            } = data;
+            let index = -1;
+            for (let i=0; i<myTeam.mines.length; i++) {
+                const mine = myTeam.mines[i];
+                if (mine[0] === triggerMineCol && mine[1] === triggerMineRow) {
+                    index = i;
+                    break;
+                }
             }
-            if (currentEnemyCol === attackCol && currentEnemyRow === attackRow) {
-                takeDamage(enemyTeam, 2);
-                myTeam.lastActionResult = 'The Enemy ship took 2 damage.';
-            } else if (Math.abs(currentEnemyCol - attackCol) <= 1 && Math.abs(currentEnemyRow - attackRow) <= 1) {
-                takeDamage(enemyTeam, 1);
-                myTeam.lastActionResult = 'The Enemy ship took 1 damage.';
-            } else {
-                myTeam.lastActionResult = 'The Torpedo missed the Enemy ship.';
+            if (index >= 0) {
+                triggerAttack(myTeam, enemyTeam, triggerMineCol, triggerMineRow, Systems.Torpedo);
+                const newMines = [...myTeam.mines];
+                newMines.splice(index, 1);
+                myTeam.mines = newMines;
             }
-            myTeam.history.push(`Fired Torpedo at ${letters[attackCol]}${attackRow + 1}`);
-            myTeam.systems[Systems.Torpedo].filled = 0;
-            gameState.pauseAction = null;
             break;
         default:
             console.error('Unknown message type', type ,'received from user', name);

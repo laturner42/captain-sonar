@@ -54,7 +54,25 @@ export default function Captain(props) {
         currentRow,
     ] = getCurrentLoc(myTeam.currentShipPath);
 
-    const badLocations = getBadLocations(myTeam.currentShipPath, map);
+    const badLocations = getBadLocations(myTeam, map);
+
+    const possibleMineLocations = [];
+    for (let r=-1; r<=1; r++) {
+        for (let c=-1; c<= 1; c++) {
+            const col = currentCol + c;
+            const row = currentRow + r;
+            let active = true;
+            for (const badLoc of badLocations) {
+                if (col === badLoc[0] && row === badLoc[1]) {
+                    active = false;
+                    break;
+                }
+            }
+            if (active) {
+                possibleMineLocations.push([col, row]);
+            }
+        }
+    }
 
     const dirs = [
         {
@@ -97,10 +115,15 @@ export default function Captain(props) {
 
     const clickMap = (e) => {
         const rect = e.target.getBoundingClientRect();
-        const x = e.clientX - rect.left; //x position within the element.
-        const y = e.clientY - rect.top;  //y position within the element.
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
         const newCol = Math.floor((x / MAP_WIDTH) * (TILE_SIZE / 2));
         const newRow = Math.floor((y / MAP_HEIGHT) * (TILE_SIZE / 2));
+        for (const badLoc of badLocations) {
+            if (newCol === badLoc[0] && newRow === badLoc[1]) {
+                return;
+            }
+        }
         setPlacementCol(newCol);
         setPlacementRow(newRow);
         sendMessage(
@@ -152,6 +175,35 @@ export default function Captain(props) {
                         onMouseDown={startSelected ? undefined : clickMap}
                     />
                     {
+                        myTeam.mines.map((mine) => (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    left: TILE_SIZE + (TILE_SIZE * mine[0]) + (TILE_SIZE / 2) - (markerSize / 2),
+                                    top: TILE_SIZE + (TILE_SIZE * mine[1]) + (TILE_SIZE / 2) - (markerSize / 2),
+                                    width: markerSize - 10,
+                                    height: markerSize - 10,
+                                    borderStyle: 'solid',
+                                    borderWidth: 5,
+                                    borderColor: 'red',
+                                    borderRadius: markerSize,
+                                    cursor: (enableActions && !myTeam.hasFired) ? 'pointer' : undefined,
+                                }}
+                                onClick={() => {
+                                    if (enableActions && !myTeam.hasFired) {
+                                        sendMessage(
+                                            MessageTypes.TRIGGER_MINE,
+                                            {
+                                                col: mine[0],
+                                                row: mine[1],
+                                            }
+                                        )
+                                    }
+                                }}
+                            />
+                        ))
+                    }
+                    {
                         !startSelected && (
                             <div
                                 style={{
@@ -162,7 +214,7 @@ export default function Captain(props) {
                                     height: markerSize - 10,
                                     borderStyle: 'solid',
                                     borderWidth: 5,
-                                    borderColor: 'red',
+                                    borderColor: 'lime',
                                     borderRadius: markerSize,
                                 }}
                             />
@@ -177,7 +229,7 @@ export default function Captain(props) {
                             pauseAction={pauseAction}
                             sendMessage={sendMessage}
                             map={map}
-                            disabledDirections={disabledDirections}
+                            possibleMineLocations={possibleMineLocations}
                         />
                     )
                 }

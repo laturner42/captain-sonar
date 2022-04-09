@@ -18,6 +18,7 @@ const MessageTypes = {
 
     SURFACE: 16,
     UNDO_HEAD: 17,
+    TRIGGER_MINE: 18,
 };
 
 const Jobs = {
@@ -62,15 +63,15 @@ const TILE_SIZE = 30;
 const BOARD_WIDTH = 15;
 const BOARD_HEIGHT = 15;
 
-const getBadLocations = (currentPath, map) => {
+const getBadLocations = (team, map) => {
     const {
         startCol,
         startRow,
         path,
-    } = currentPath;
+    } = team.currentShipPath;
     let currentCol = startCol;
     let currentRow = startRow;
-    const badLocs = [...map.islandLocs, [currentCol, currentRow]];
+    const badLocs = [...team.mines, ...map.islandLocs, [currentCol, currentRow]];
 
     const moves = {
         [Directions.North]: [0, -1],

@@ -6,6 +6,7 @@ import {Systems} from '../components/systems';
 import SonarAction from '../components/actions/SonarAction';
 import DroneAction from '../components/actions/DroneAction';
 import TorpedoAction from '../components/actions/TorpedoAction';
+import MinesAction from '../components/actions/MinesAction';
 
 export default function PauseActionScreen(props) {
     const {
@@ -14,6 +15,7 @@ export default function PauseActionScreen(props) {
         pauseAction,
         sendMessage,
         map,
+        possibleMineLocations,
     } = props;
 
     const {
@@ -83,6 +85,7 @@ export default function PauseActionScreen(props) {
                 { system === Systems.Sonar && <SonarAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
                 { system === Systems.Drone && <DroneAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
                 { system === Systems.Torpedo && <TorpedoAction map={map} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
+                { system === Systems.Mines && <MinesAction possibleMineLocations={possibleMineLocations} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
             </div>
         </div>
     )
