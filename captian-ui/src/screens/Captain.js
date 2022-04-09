@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Button,
 } from '@mui/material';
@@ -11,21 +11,17 @@ import {
     MessageTypes,
     TILE_SIZE,
     Directions,
-    BOARD_HEIGHT,
-    BOARD_WIDTH, MAP_WIDTH, MAP_HEIGHT,
-    getBadLocations, getCurrentLoc, Jobs as ScreenNames,
+    MAP_WIDTH,
+    MAP_HEIGHT,
+    getBadLocations,
+    getCurrentLoc,
 } from '../constants';
-import {
-    Systems,
-} from '../components/systems';
-import map from '../components/rename.png';
 import Grid from '../components/Grid';
 import RenderMap from '../components/RenderMap';
 import CaptainMap from '../components/toolbelt/CaptainMap';
 import ToolBelt from '../components/toolbelt/ToolBelt';
 import { convertServerPath } from '../components/Path';
 import ConfirmSelection from '../components/Confirm';
-import CaptainSystemChoice from '../components/toolbelt/CaptainSystemChoice';
 import SystemChoices from '../components/toolbelt/SystemChoices';
 import {getDefaultMap} from '../components/Map';
 import PauseActionScreen from './PauseActionScreen';
@@ -44,6 +40,10 @@ export default function Captain(props) {
     const [placementCol, setPlacementCol] = useState(myTeam.currentShipPath.startCol);
     const [placementRow, setPlacementRow] = useState(myTeam.currentShipPath.startRow);
     const [map, setMap] = useState(getDefaultMap(mapNbr));
+
+    useEffect(() => {
+        setMap(getDefaultMap(mapNbr));
+    }, [mapNbr]);
 
     const { startSelected } = myTeam;
     const { startSelected: enemyStartSelected } = enemyTeam;
@@ -171,7 +171,7 @@ export default function Captain(props) {
                         path={shipPath}
                         hidePath={!startSelected}
                         boardMargin={0}
-                        lineColor="#444"
+                        lineColor={myTeam.surfaced ? '#aaa': '#444'}
                         onMouseDown={startSelected ? undefined : clickMap}
                     />
                     {
@@ -187,10 +187,10 @@ export default function Captain(props) {
                                     borderWidth: 5,
                                     borderColor: 'red',
                                     borderRadius: markerSize,
-                                    cursor: (enableActions && !myTeam.hasFired) ? 'pointer' : undefined,
+                                    cursor: enableActions ? 'pointer' : undefined,
                                 }}
                                 onClick={() => {
-                                    if (enableActions && !myTeam.hasFired) {
+                                    if (enableActions) {
                                         sendMessage(
                                             MessageTypes.TRIGGER_MINE,
                                             {

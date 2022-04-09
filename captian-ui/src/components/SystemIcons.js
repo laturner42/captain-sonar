@@ -43,7 +43,7 @@ export const dirIcon = (direction, oStyle = {}) => (
 
 export const SystemIcons = {
     [Systems.Torpedo]: <Torpedo fontSize="inherit" />,
-    [Systems.Mines]: <Mines fontSize="inherit" />,
+    [Systems.Mine]: <Mines fontSize="inherit" />,
     [Systems.Drone]: <Drone fontSize="inherit" />,
     [Systems.Sonar]: <Sonar fontSize="inherit" />,
     [Systems.Silence]: <Silence fontSize="inherit" />,

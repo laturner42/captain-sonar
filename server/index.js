@@ -2,7 +2,7 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH } = require('../captian-ui/src/constants');
 const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
@@ -26,7 +26,7 @@ const newTeam = (teamNbr) => {
                 max: 3,
                 filled: 3,
             },
-            [Systems.Mines]: {
+            [Systems.Mine]: {
                 max: 3,
                 filled: 3,
             },
@@ -47,6 +47,9 @@ const newTeam = (teamNbr) => {
             startCol: 7,
             startRow: 7,
             path: [],
+        },
+        savedPaths: {
+            'current': [BOARD_WIDTH/2, BOARD_WIDTH/2],
         },
         history: [],
         startSelected: false,
@@ -138,7 +141,7 @@ const triggerAttack = (myTeam, enemyTeam, attackCol, attackRow, system) => {
         takeDamage(enemyTeam, 1);
         myTeam.lastActionResult = 'The Enemy ship took 1 damage.';
     } else {
-        myTeam.lastActionResult = `The ${Systems.Mines} missed the Enemy ship.`;
+        myTeam.lastActionResult = `The ${Systems.Mine} missed the Enemy ship.`;
     }
     if (system === Systems.Torpedo) {
         myTeam.systems[Systems.Torpedo].filled = 0;
@@ -279,7 +282,7 @@ const parseMessage = async (packet, connection) => {
             }
             break;
         case MessageTypes.SURFACE:
-            if (myTeam.surfaced) break;
+            if (myTeam.surfaced || gameState.pauseAction || myTeam.pendingMove) break;
             const [ currentCol, currentRow ] = getCurrentLoc(myTeam.currentShipPath);
             myTeam.history.push(`Surfaced in Sector ${calculateSector(currentCol, currentRow)}`);
             myTeam.surfaced = true;
@@ -288,6 +291,8 @@ const parseMessage = async (packet, connection) => {
             setTimeout(() => {
                 myTeam.history.push('Dove');
                 myTeam.pastShipPaths.push(myTeam.currentShipPath);
+                const totalPaths = Object.keys(myTeam.savedPaths).length;
+                myTeam.savedPaths[totalPaths - 1] = myTeam.savedPaths['current'];
                 myTeam.currentShipPath = {
                     startCol: myTeam.currentShipPath.startCol,
                     startRow: myTeam.currentShipPath.startRow,
@@ -319,14 +324,14 @@ const parseMessage = async (packet, connection) => {
             gameState.pauseAction = null;
             break;
         case MessageTypes.PLACE_MINE:
-            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Mines) break;
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Mine) break;
             const {
                 col: mineCol,
                 row: mineRow,
             } = data;
             myTeam.lastActionResult = `Mine placed at ${letters[mineCol]}${mineRow + 1}.`;
             myTeam.mines.push([mineCol, mineRow]);
-            myTeam.systems[Systems.Mines].filled = 0;
+            myTeam.systems[Systems.Mine].filled = 0;
             myTeam.history.push('Placed Mine');
             gameState.pauseAction = null;
             break;
@@ -338,7 +343,16 @@ const parseMessage = async (packet, connection) => {
             } = data;
             triggerAttack(myTeam, enemyTeam, torpedoCol, torpedoRow, Systems.Torpedo)
             break;
+        case MessageTypes.SAVE_MAP_LOC:
+            const {
+                mapKey,
+                x,
+                y,
+            } = data;
+            myTeam.savedPaths[mapKey] = [x, y];
+            break;
         case MessageTypes.TRIGGER_MINE:
+            if (gameState.pauseAction || myTeam.surfaced) break;
             const {
                 col: triggerMineCol,
                 row: triggerMineRow,
@@ -352,7 +366,7 @@ const parseMessage = async (packet, connection) => {
                 }
             }
             if (index >= 0) {
-                triggerAttack(myTeam, enemyTeam, triggerMineCol, triggerMineRow, Systems.Torpedo);
+                triggerAttack(myTeam, enemyTeam, triggerMineCol, triggerMineRow, Systems.Mine);
                 const newMines = [...myTeam.mines];
                 newMines.splice(index, 1);
                 myTeam.mines = newMines;

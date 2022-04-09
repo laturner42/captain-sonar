@@ -78,7 +78,7 @@ export default function SetRoles(props) {
         return (
             <div
                 style={{
-                    margin: 100,
+                    margin: 80,
                     marginTop: 0,
                     marginBottom: 0,
                 }}

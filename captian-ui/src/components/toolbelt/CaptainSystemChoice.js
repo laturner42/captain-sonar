@@ -20,7 +20,7 @@ export default function CaptainSystemChoice(props) {
 
     const titles = {
         [Systems.Torpedo]: 'Fire a Torpedo up to 4 tiles away',
-        [Systems.Mines]: 'Place a Mine in an adjacent tile',
+        [Systems.Mine]: 'Place a Mine in an adjacent tile',
         [Systems.Sonar]: 'Ask the enemy if they are in a particular Sector',
         [Systems.Drone]: 'Get two pieces of info from the enemy - only one is true',
         [Systems.Silence]: 'Move up to 4 spaces in a single direction without detection',

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import {
+    MessageTypes,
     TILE_SIZE,
 } from '../constants';
 import Grid from '../components/Grid';
@@ -15,16 +16,34 @@ export default function Navigator(props) {
     const {
         boardWidth,
         boardHeight,
+        myTeam,
         enemyTeam,
         mapNbr,
+        sendMessage,
     } = props;
 
     const [onCurrentPath, setOnCurrentPath] = useState(true);
+    const [selectedPathKey, setSelectedPathKey] = useState('current');
     const [selectedPath, setSelectedPath] = useState(enemyTeam.currentShipPath);
     const [map, setMap] = useState(getDefaultMap(mapNbr));
 
+    useEffect(() => {
+        setMap(getDefaultMap(mapNbr));
+    }, [mapNbr]);
+
+    const shipPath = convertServerPath(onCurrentPath ? enemyTeam.currentShipPath : selectedPath, true);
+
+    const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
+    const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
+
+    // const [offsetCoords, setOffsetCoords] = useState([(width/2) - (TILE_SIZE/2) - TILE_SIZE, (height/2) - (TILE_SIZE/2) - TILE_SIZE]);
+    const [offsetCoords, setOffsetCoords] = useState(myTeam.savedPaths['current']);
+    const [dragCoords, setDragCoords] = useState(null);
+
     const changePath = ({ target }) => {
         const { value: newPath } = target;
+        setSelectedPathKey(newPath);
+        setOffsetCoords(myTeam.savedPaths[newPath]);
         if (newPath === 'current') {
             setOnCurrentPath(true)
             setSelectedPath(enemyTeam.currentShipPath);
@@ -36,30 +55,32 @@ export default function Navigator(props) {
         }
     }
 
-    const shipPath = convertServerPath(onCurrentPath ? enemyTeam.currentShipPath : selectedPath, true);
-
-    const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
-    const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
-
-    const [offsetCoords, setOffsetCoords] = useState([(width/2) - (TILE_SIZE/2) - TILE_SIZE, (height/2) - (TILE_SIZE/2) - TILE_SIZE]);
-    const [dragCoords, setDragCoords] = useState(null);
-
 
     const dragStart = (event) => {
         event.preventDefault();
         setDragCoords([event.pageX - offsetCoords[0], event.pageY - offsetCoords[1]]);
     }
 
-    const updateOffset = (event) => {
+    const updateOffset = (event, end) => {
         const offset = [(event.pageX - dragCoords[0]), event.pageY - dragCoords[1]];
         offset[0] = Math.min(Math.max(offset[0], 0), (TILE_SIZE * boardWidth) - (TILE_SIZE * shipPath.pathWidth));
         offset[1] = Math.min(Math.max(offset[1], 0), (TILE_SIZE * boardHeight) - (TILE_SIZE * shipPath.pathHeight));
         setOffsetCoords(offset);
+        if (end) {
+            sendMessage(
+                MessageTypes.SAVE_MAP_LOC,
+                {
+                    mapKey: selectedPathKey,
+                    x: offset[0],
+                    y: offset[1],
+                }
+            )
+        }
     }
 
     const dragEnd = (event) => {
         event.preventDefault();
-        updateOffset(event);
+        updateOffset(event, true);
         setDragCoords(null);
     }
 
@@ -114,6 +135,7 @@ export default function Navigator(props) {
                     removeOutlines
                 />
                 <EnemyHistory
+                    isEnemy
                     team={enemyTeam}
                 />
                 <div

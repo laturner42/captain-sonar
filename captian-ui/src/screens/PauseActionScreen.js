@@ -85,7 +85,7 @@ export default function PauseActionScreen(props) {
                 { system === Systems.Sonar && <SonarAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
                 { system === Systems.Drone && <DroneAction isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
                 { system === Systems.Torpedo && <TorpedoAction map={map} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
-                { system === Systems.Mines && <MinesAction possibleMineLocations={possibleMineLocations} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
+                { system === Systems.Mine && <MinesAction possibleMineLocations={possibleMineLocations} isMyAction={isMyAction} myTeam={myTeam} enemyTeam={enemyTeam} sendMessage={sendMessage} /> }
             </div>
         </div>
     )

@@ -6,7 +6,6 @@ import {
 import {
     BOARD_WIDTH,
     BOARD_HEIGHT,
-    MessageTypes,
     Jobs as ScreenNames,
     getTeams,
     getMyRole,
@@ -16,7 +15,6 @@ import Captain from '../screens/Captain';
 import Navigator from '../screens/Navigator';
 import FirstMate from '../screens/FirstMate';
 import Engineer from '../screens/Engineer';
-import PauseActionScreen from '../screens/PauseActionScreen';
 
 export default function Gameplay(props) {
     const {
@@ -34,7 +32,20 @@ export default function Gameplay(props) {
 
     const [activeScreen, setActiveScreen] = useState(myJob || ScreenNames.CAPTAIN);
 
+
+    useEffect(() => {
+        if (!myTeam || !enemyTeam) return;
+        if (myTeam.health <= 0 && enemyTeam.health <= 0) {
+            alert('It\'s a draw!');
+        } else if (myTeam.health <= 0) {
+            alert('Sunk! Enemy victory.');
+        } else if (enemyTeam.health <= 0) {
+            alert('Enemy Sunk! You win!');
+        }
+    }, [myTeam, enemyTeam]);
+
     if (!gameData) return null;
+
 
     return (
         <div style={{
@@ -112,7 +123,7 @@ export default function Gameplay(props) {
                 activeScreen === ScreenNames.CAPTAIN && <Captain pauseAction={gameData.pauseAction} mapNbr={gameData.map} sendMessage={sendMessage} myTeam={myTeam} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                activeScreen === ScreenNames.NAVIGATOR && <Navigator mapNbr={gameData.map} sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.NAVIGATOR && <Navigator mapNbr={gameData.map} myTeam={myTeam} sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
                 activeScreen === ScreenNames.FIRSTMATE && <FirstMate sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />

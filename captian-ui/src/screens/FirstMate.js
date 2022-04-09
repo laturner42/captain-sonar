@@ -68,7 +68,7 @@ export default function Navigator(props) {
                         }}
                     >
                         <System system={Systems.Torpedo} pendingMove={pendingMove} onClick={onClick} systems={systems} />
-                        <System system={Systems.Mines} pendingMove={pendingMove} onClick={onClick} systems={systems} />
+                        <System system={Systems.Mine} pendingMove={pendingMove} onClick={onClick} systems={systems} />
                     </div>
                     <div
                         style={{

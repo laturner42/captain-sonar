@@ -1,6 +1,6 @@
 const Systems = {
     Torpedo: 'Torpedo',
-    Mines: 'Mines',
+    Mine: 'Mine',
     Drone: 'Drone',
     Sonar: 'Sonar',
     Silence: 'Silence',
@@ -8,7 +8,7 @@ const Systems = {
 
 const SystemColors = {
     [Systems.Torpedo]: 'red',
-    [Systems.Mines]: 'red',
+    [Systems.Mine]: 'red',
     [Systems.Drone]: 'green',
     [Systems.Sonar]: 'green',
     [Systems.Silence]: '#ddb600',
@@ -31,7 +31,7 @@ const SubSystemsColors = {
 
 const DependentSubSystem = {
     [Systems.Torpedo]: SubSystems.Weapons,
-    [Systems.Mines]: SubSystems.Weapons,
+    [Systems.Mine]: SubSystems.Weapons,
     [Systems.Drone]: SubSystems.Search,
     [Systems.Sonar]: SubSystems.Search,
     [Systems.Silence]: SubSystems.Flee,

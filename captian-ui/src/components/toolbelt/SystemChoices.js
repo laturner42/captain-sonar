@@ -46,7 +46,7 @@ export default function SystemChoices(props) {
                             sendMessage={sendMessage}
                         />
                         <CaptainSystemChoice
-                            system={Systems.Mines}
+                            system={Systems.Mine}
                             systems={team.systems}
                             disabled={!enableActions}
                             clickable={clickable}

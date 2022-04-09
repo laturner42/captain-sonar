@@ -63,8 +63,8 @@ export default function TorpedoAction(props) {
                 <div
                     key={`torpedo-tile-${col}${row}`}
                     style={{
-                        width: TILE_SIZE,
-                        height: TILE_SIZE,
+                        width: TILE_SIZE * 0.75,
+                        height: TILE_SIZE * 0.75,
                         margin: 1,
                         backgroundColor: active ? (selected ? 'red' : '#6af') : undefined,
                         borderWidth: 1,
