@@ -22,7 +22,6 @@ export default function App() {
     }))
 
     const join = () => {
-        console.log('oh my god were joining');
         sendMessage(MessageTypes.JOIN)
     }
 

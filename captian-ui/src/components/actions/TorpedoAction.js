@@ -6,7 +6,7 @@ import {
     Navigation as Arrow,
     MyLocation as Compass,
 } from '@mui/icons-material';
-import {letters, getCurrentLoc, MessageTypes, TILE_SIZE} from '../../constants';
+import {letters, getCurrentLoc, MessageTypes, TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT} from '../../constants';
 
 export default function TorpedoAction(props) {
     const {
@@ -52,10 +52,14 @@ export default function TorpedoAction(props) {
             const col = currentCol + c;
             const row = currentRow + r;
             let active = Math.abs(Math.abs(c) + Math.abs(r)) <= 4;
-            for (const island of map.islandLocs) {
-                if (col === island[0] && row === island[1]) {
-                    active = false;
-                    break;
+            if (row < 0 || col < 0 || col > BOARD_WIDTH - 1 || row > BOARD_HEIGHT - 1) {
+                active = false;
+            } else {
+                for (const island of map.islandLocs) {
+                    if (col === island[0] && row === island[1]) {
+                        active = false;
+                        break;
+                    }
                 }
             }
             const selected = col === selectedLoc[0] && row === selectedLoc[1];
@@ -118,8 +122,9 @@ export default function TorpedoAction(props) {
                     }}
                 >
                     {
-                        spaces.map((line) => (
+                        spaces.map((line, i) => (
                             <div
+                                key={`torpedo-line-${i}`}
                                 style={{ display: 'flex', flexDirection: 'row' }}
                             >
                                 {line}

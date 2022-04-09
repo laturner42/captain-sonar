@@ -35,17 +35,16 @@ export default function Gameplay(props) {
 
     useEffect(() => {
         if (!myTeam || !enemyTeam) return;
-        if (myTeam.health <= 0 && enemyTeam.health <= 0) {
+        if (myTeam.health === 0 && enemyTeam.health === 0) {
             alert('It\'s a draw!');
-        } else if (myTeam.health <= 0) {
-            alert('Sunk! Enemy victory.');
-        } else if (enemyTeam.health <= 0) {
+        } else if (myTeam.health === 0) {
+            alert('You Sunk! Enemy victory.');
+        } else if (enemyTeam.health === 0) {
             alert('Enemy Sunk! You win!');
         }
     }, [myTeam, enemyTeam]);
 
     if (!gameData) return null;
-
 
     return (
         <div style={{

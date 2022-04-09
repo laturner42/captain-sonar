@@ -14,7 +14,7 @@ const MessageTypes = {
     LAUNCH_TORPEDO: 12,
     SEND_DRONES: 13,
     SCAN_SONAR: 14,
-    BE_QUIET: 15,
+    MOVE_QUIETLY: 15,
 
     SURFACE: 16,
     UNDO_HEAD: 17,

@@ -177,6 +177,7 @@ export default function Captain(props) {
                     {
                         myTeam.mines.map((mine) => (
                             <div
+                                key={`mine-${mine[0]}-${mine[1]}`}
                                 style={{
                                     position: 'absolute',
                                     left: TILE_SIZE + (TILE_SIZE * mine[0]) + (TILE_SIZE / 2) - (markerSize / 2),
@@ -264,9 +265,9 @@ export default function Captain(props) {
                             {
                                 [1,2,3,4].map((health) => {
                                     if (health <= myTeam.health) {
-                                        return <Heart style={{ color: 'pink' }} />
+                                        return <Heart key={`health-${health}-y`} style={{ color: 'pink' }} />
                                     } else {
-                                        return <EmptyHeart style={{ color: 'gray' }} />
+                                        return <EmptyHeart key={`health-${health}-n`} style={{ color: 'gray' }} />
                                     }
                                 })
                             }

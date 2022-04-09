@@ -2,7 +2,7 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH, TILE_SIZE } = require('../captian-ui/src/constants');
 const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
@@ -49,7 +49,7 @@ const newTeam = (teamNbr) => {
             path: [],
         },
         savedPaths: {
-            'current': [BOARD_WIDTH/2, BOARD_WIDTH/2],
+            'current': [((BOARD_WIDTH * TILE_SIZE)/2) - (TILE_SIZE/2), ((BOARD_WIDTH * TILE_SIZE)/2) - (TILE_SIZE/2)],
         },
         history: [],
         startSelected: false,
@@ -125,6 +125,17 @@ const takeDownSystem = (team, system) => {
     }
 }
 
+const startNewPath = (myTeam, enemyTeam, startCol, startRow) => {
+    myTeam.pastShipPaths.push(myTeam.currentShipPath);
+    const totalPaths = Object.keys(myTeam.pastShipPaths).length;
+    enemyTeam.savedPaths[totalPaths - 1] = enemyTeam.savedPaths['current'];
+    myTeam.currentShipPath = {
+        startCol: startCol || myTeam.currentShipPath.startCol,
+        startRow: startRow || myTeam.currentShipPath.startRow,
+        path: [],
+    };
+}
+
 const triggerAttack = (myTeam, enemyTeam, attackCol, attackRow, system) => {
     const [ currentSelfCol, currentSelfRow ] = getCurrentLoc(myTeam.currentShipPath);
     const [ currentEnemyCol, currentEnemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
@@ -141,7 +152,7 @@ const triggerAttack = (myTeam, enemyTeam, attackCol, attackRow, system) => {
         takeDamage(enemyTeam, 1);
         myTeam.lastActionResult = 'The Enemy ship took 1 damage.';
     } else {
-        myTeam.lastActionResult = `The ${Systems.Mine} missed the Enemy ship.`;
+        myTeam.lastActionResult = `The ${system} missed the Enemy ship.`;
     }
     if (system === Systems.Torpedo) {
         myTeam.systems[Systems.Torpedo].filled = 0;
@@ -290,17 +301,21 @@ const parseMessage = async (packet, connection) => {
             // Dive 60s Later
             setTimeout(() => {
                 myTeam.history.push('Dove');
-                myTeam.pastShipPaths.push(myTeam.currentShipPath);
-                const totalPaths = Object.keys(myTeam.savedPaths).length;
-                myTeam.savedPaths[totalPaths - 1] = myTeam.savedPaths['current'];
-                myTeam.currentShipPath = {
-                    startCol: myTeam.currentShipPath.startCol,
-                    startRow: myTeam.currentShipPath.startRow,
-                    path: [],
-                };
+                startNewPath(myTeam, enemyTeam);
                 myTeam.surfaced = false;
                 updateEveryone();
             }, 60 * 1000);
+            break;
+        case MessageTypes.MOVE_QUIETLY:
+            if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Silence) break;
+            const {
+                col: newStartCol,
+                row: newStartRow,
+            } = data;
+            startNewPath(myTeam, enemyTeam, newStartCol, newStartRow);
+            myTeam.history.push('Moved Cloaked');
+            myTeam.systems[Systems.Silence].filled = 0;
+            gameState.pauseAction = null;
             break;
         case MessageTypes.SCAN_SONAR:
             if (!gameState.pauseAction || gameState.pauseAction.system !== Systems.Sonar) break;
