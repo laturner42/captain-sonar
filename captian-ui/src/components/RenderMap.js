@@ -2,6 +2,8 @@ import { TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, letters } from '../constants';
 
 const numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 
+const devMode = false;
+
 const lineTiles = (horizontal, dim = false) => {
     const values = horizontal ? letters : numbers;
     return (
@@ -23,7 +25,7 @@ const lineTiles = (horizontal, dim = false) => {
                 )
             }
             {
-                values.map((val) => (
+                values.map((val, i) => (
                     <div
                         key={`tile-${val}-${horizontal}-${dim}`}
                         style={{
@@ -37,7 +39,7 @@ const lineTiles = (horizontal, dim = false) => {
                             opacity: dim ? 0.25 : 1.0,
                         }}
                     >
-                        {val}
+                        {devMode ? i : val}
                     </div>
                 ))
             }

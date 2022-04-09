@@ -85,7 +85,7 @@ export default function SetRoles(props) {
             >
                 <span style={{ fontSize: 30 }}>Team {team.teamNbr}</span>
                 {
-                    Object.keys(Jobs).map((job) => {
+                    Object.keys(Jobs).reverse().map((job) => {
                         const removeJob = () => {
                             sendMessage(
                                 MessageTypes.REMOVE_PLAYER,
@@ -108,7 +108,7 @@ export default function SetRoles(props) {
                                     borderBottomStyle: 'solid',
                                 }}
                             >
-                                <span style={{ color: '#ddf', fontSize: 24 }}>{Jobs[job]}</span>
+                                <span style={{ color: job === Jobs.CAPTAIN ? '#dfd' : '#ddf', fontSize: 24 }}>{Jobs[job]}</span>
                                 <div
                                     style={{
                                         display: 'flex',
