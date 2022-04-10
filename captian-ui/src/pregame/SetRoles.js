@@ -12,7 +12,6 @@ export default function SetRoles(props) {
     const {
         sendMessage,
         gameData,
-        myName,
     } = props;
 
     const [movingPlayer, setMovingPlayer] = useState(null)
@@ -163,18 +162,52 @@ export default function SetRoles(props) {
                 {renderTeam(gameData.team1)}
                 {renderTeam(gameData.team2)}
             </div>
-            <Button
-                disabled={!gameData.team1.roles[Jobs.CAPTAIN] || !gameData.team2.roles[Jobs.CAPTAIN]}
-                onClick={() => {
-                    sendMessage(
-                        MessageTypes.START_GAME,
-                    )
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginTop: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                 }}
-                variant="contained"
-                style={{ marginTop: 20 }}
             >
-                Start
-            </Button>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <span>Map</span>
+                    <select
+                        value={gameData.map}
+                        onChange={({ target }) => {
+                            sendMessage(
+                                MessageTypes.CHANGE_MAP,
+                                {
+                                    newMap: parseInt(`${target.value}`, 10),
+                                }
+                            )
+                        }}
+                    >
+                        <option value={1}>Alpha Map</option>
+                        <option value={2}>Foxtrot Map</option>
+                    </select>
+                </div>
+                <Button
+                    disabled={!gameData.team1.roles[Jobs.CAPTAIN] || !gameData.team2.roles[Jobs.CAPTAIN]}
+                    onClick={() => {
+                        sendMessage(
+                            MessageTypes.START_GAME,
+                        )
+                    }}
+                    variant="contained"
+                    style={{
+                        marginLeft: 30,
+                    }}
+                >
+                    Start
+                </Button>
+            </div>
         </div>
     )
 }

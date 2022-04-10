@@ -20,6 +20,7 @@ const MessageTypes = {
     UNDO_HEAD: 17,
     TRIGGER_MINE: 18,
     SAVE_MAP_LOC: 19,
+    CHANGE_MAP: 20,
 };
 
 const Jobs = {

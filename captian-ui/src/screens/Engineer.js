@@ -6,10 +6,11 @@ import {
 } from '../constants';
 import {
     SubSystems,
-    SubSystemsColors,
+    SubSystemsColors, Systems, DependentSubSystem, SystemColors,
 } from '../components/systems';
 import {
     SubSystemsIcons,
+    SystemIcons,
     dirIcon,
 } from '../components/SystemIcons';
 import Notes from '../components/toolbelt/Notes';
@@ -35,6 +36,7 @@ export default function Navigator(props) {
     }
 
     const { pendingMove, offlineSystems } = myTeam;
+
 
     const width = (boardWidth * TILE_SIZE) + (TILE_SIZE * 2);
     const height = (boardHeight * TILE_SIZE) + (TILE_SIZE * 2);
@@ -181,6 +183,7 @@ export default function Navigator(props) {
 
                                                 return (
                                                     <div
+                                                        key={`eng-selection-${subsystem.name}-${direction}-${i}`}
                                                         style={{
                                                             opacity: offline ? '0.2' : '1',
                                                             display: 'flex',
@@ -189,7 +192,9 @@ export default function Navigator(props) {
                                                             color,
                                                             backgroundColor: SubSystemsColors[icon],
                                                             borderRadius: iconSize,
-                                                            border: `2px solid ${selectable ? color : 'none'}`,
+                                                            borderWidth: 2,
+                                                            borderStyle: 'solid',
+                                                            borderColor: selectable ? color : SubSystemsColors[icon],
                                                             marginLeft: 3,
                                                             marginRight: 3,
                                                             cursor: offline || !selectable ? undefined : 'pointer',
@@ -239,15 +244,83 @@ export default function Navigator(props) {
                         width: '90%',
                     }}
                 >
-                    <span><span style={{ color: '#f55' }}>1 Ship Damage</span> occurs at the end of a Move if either:</span>
+                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if inclusive 4 Systems are offline</span>
+                    <span><span style={{ color: '#f55' }}>1 Damage</span> occurs & all Systems <span style={{ color: '#5f5' }}>Auto-Repair</span> if, at the end of a move, either:</span>
                     <span>- All six Systems for a Cardinal Direction are offline</span>
                     <span>- All six Reactors are offline</span>
-                    <span>A, B, C will <span style={{ color: '#5f5' }}>Auto-Repair</span> if inclusive 4 Systems are offline</span>
-                    <span>All Systems will <span style={{ color: '#5f5' }}>Auto-Repair</span> if all six Reactors are offline</span>
+                    {/*<span>All Systems will <span style={{ color: '#5f5' }}>Auto-Repair</span> if all six Reactors are offline</span>*/}
                 </div>
             </div>
             <ToolBelt>
                 <Notes />
+                {
+                    Object.values(SubSystems)
+                        .filter(subsystem => subsystem !== SubSystems.Reactor)
+                        .map((subsystem) => (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '100%',
+                                marginTop: 5,
+                            }}
+                        >
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    marginLeft: 20,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        color: SubSystemsColors[subsystem],
+                                        fontSize: 30,
+                                        marginRight: 10,
+                                    }}
+                                >
+                                    {SubSystemsIcons[subsystem]}
+                                </div>
+                                <span>{subsystem}</span>
+                            </div>
+                            <div
+                            style={{
+                                marginLeft: 40,
+                                marginTop: -5,
+                                marginBottom: 10,
+                            }}
+                            >
+                                {
+                                    Object.values(Systems)
+                                        .filter(system => DependentSubSystem[system] === subsystem)
+                                        .map((system) => (
+                                            <div
+                                                style={{
+                                                    fontSize: 17,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        marginRight: 10,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        backgroundColor: SystemColors[system],
+                                                        borderRadius: 22,
+                                                        fontSize: 22,
+                                                    }}
+                                                >
+                                                    {SystemIcons[system]}
+                                                </div>
+                                                <span>{system}</span>
+                                            </div>
+                                        ))
+                                }
+                            </div>
+                        </div>
+                    ))
+                }
                 {
                     !!pendingMove && (
                         <ConfirmSelection disabled={!pendingMove.engineerSelection || pendingMove.confirmed[Jobs.ENGINEER]} job={Jobs.ENGINEER} sendMessage={sendMessage} />

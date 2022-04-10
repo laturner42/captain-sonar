@@ -2,7 +2,7 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH, TILE_SIZE } = require('../captian-ui/src/constants');
+const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH, TILE_SIZE, Directions } = require('../captian-ui/src/constants');
 const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};
@@ -104,16 +104,23 @@ const takeDownSystem = (team, system) => {
     team.offlineSystems.push(system);
     const counts = {};
     let reactorsOffline = 0;
+    const offlinePerDirection = {
+        [Directions.North]: 0,
+        [Directions.South]: 0,
+        [Directions.East]: 0,
+        [Directions.West]: 0,
+    }
     for (const system of team.offlineSystems) {
         if (!counts[system.subsystem]) {
             counts[system.subsystem] = 0;
         }
+        offlinePerDirection[system.direction] += 1;
         counts[system.subsystem] += 1;
         if (system.system === SubSystems.Reactor) {
             reactorsOffline += 1;
         }
     }
-    if (reactorsOffline === 6) {
+    if (reactorsOffline === 6 || Object.values(offlinePerDirection).includes(6)) {
         team.health -= 1;
         team.offlineSystems = [];
     } else {
@@ -196,6 +203,13 @@ const parseMessage = async (packet, connection) => {
             const oldTeam = oldTeamNbr === 1 ? gameState.team1 : gameState.team2;
             oldTeam.roles[oldJob] = null;
             break;
+        case MessageTypes.CHANGE_MAP:
+            if (gameState.gameStarted) break;
+            const {
+                newMap,
+            } = data;
+            gameState.map = newMap;
+            break;
         case MessageTypes.START_GAME:
             gameState.gameStarted = true;
             break;
@@ -238,6 +252,7 @@ const parseMessage = async (packet, connection) => {
             const { job } = data;
             if (job === Jobs.CAPTAIN && !myTeam.startSelected) {
                 myTeam.startSelected = true;
+                myTeam.history.push('Dove');
                 break;
             }
             if (!myTeam.pendingMove) break;

@@ -1,7 +1,5 @@
-import {
-    Directions,
-} from '../constants';
-import map1 from './rename.png';
+import alphaMap from '../maps/alpha.png';
+import deltaMap from '../maps/alpha.png';
 
 class Map {
     constructor(background, islandLocs) {
@@ -13,7 +11,60 @@ class Map {
 export const getDefaultMap = (index) => {
     if (index === 1) {
         return new Map(
-            map1,
+            alphaMap,
+            [
+                [2, 1],
+                [2, 2],
+
+                [6, 1],
+
+                [8, 2],
+                [8, 3],
+
+                [12, 1],
+                [12, 2],
+                [13, 1],
+
+                [1, 6],
+                [1, 7],
+
+                [3, 6],
+                [3, 7],
+                [3, 8],
+
+                [6, 6],
+                [6, 7],
+                [7, 8],
+
+                [8, 6],
+
+                [11, 8],
+                [12, 8],
+                [13, 8],
+
+                [3, 10],
+                [2, 11],
+
+                [0, 12],
+
+                [2, 13],
+                [3, 14],
+
+                [7, 11],
+
+                [6, 13],
+                [8, 13],
+
+                [11, 11],
+
+                [12, 12],
+                [13, 13],
+            ]
+        )
+    }
+    if (index === 2) {
+        return new Map(
+            deltaMap,
             [
                 [2, 1],
                 [2, 2],
