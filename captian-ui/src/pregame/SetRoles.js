@@ -189,8 +189,8 @@ export default function SetRoles(props) {
                             )
                         }}
                     >
-                        <option value={1}>Alpha Map</option>
-                        <option value={2}>Foxtrot Map</option>
+                        <option value={1}>Map Alpha</option>
+                        <option value={2}>Map Foxtrot</option>
                     </select>
                 </div>
                 <Button

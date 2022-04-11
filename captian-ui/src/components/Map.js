@@ -1,5 +1,5 @@
 import alphaMap from '../maps/alpha.png';
-import deltaMap from '../maps/alpha.png';
+import foxtrotMap from '../maps/foxtrot.png';
 
 class Map {
     constructor(background, islandLocs) {
@@ -64,7 +64,7 @@ export const getDefaultMap = (index) => {
     }
     if (index === 2) {
         return new Map(
-            deltaMap,
+            foxtrotMap,
             [
                 [2, 1],
                 [2, 2],

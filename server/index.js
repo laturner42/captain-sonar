@@ -136,9 +136,13 @@ const startNewPath = (myTeam, enemyTeam, startCol, startRow) => {
     myTeam.pastShipPaths.push(myTeam.currentShipPath);
     const totalPaths = Object.keys(myTeam.pastShipPaths).length;
     enemyTeam.savedPaths[totalPaths - 1] = enemyTeam.savedPaths['current'];
+    const [
+        currentCol,
+        currentRow,
+    ] = getCurrentLoc(myTeam.currentShipPath);
     myTeam.currentShipPath = {
-        startCol: startCol || myTeam.currentShipPath.startCol,
-        startRow: startRow || myTeam.currentShipPath.startRow,
+        startCol: startCol || currentCol,
+        startRow: startRow || currentRow,
         path: [],
     };
 }
@@ -339,7 +343,7 @@ const parseMessage = async (packet, connection) => {
             } = data;
             const [ enemyCol, enemyRow ] = getCurrentLoc(enemyTeam.currentShipPath);
             const actualSector = calculateSector(enemyCol, enemyRow);
-            myTeam.lastActionResult = `The Enemy is ${actualSector === chosenSector ? '' : 'not '}in Sector ${chosenSector}`;
+            myTeam.lastActionResult = `Enemy is ${actualSector === chosenSector ? '' : 'not '}in Sector ${chosenSector}`;
             myTeam.history.push(`Guessed Sector ${chosenSector}`);
             myTeam.systems[Systems.Sonar].filled = 0;
             gameState.pauseAction = null;
@@ -349,6 +353,7 @@ const parseMessage = async (packet, connection) => {
             const {
                 message,
             } = data;
+            enemyTeam.history.push(message);
             enemyTeam.lastActionResult = message;
             enemyTeam.systems[Systems.Drone].filled = 0;
             gameState.pauseAction = null;

@@ -65,15 +65,15 @@ export default function DroneAction(props) {
         else if (lieInfo === 'col') sendingCol = lieValue;
         else if (lieInfo === 'row') sendingRow = lieValue;
 
-        let message = 'The Drone reported';
+        let message = 'Drone reported';
         if (sendingSector) {
-            message += ` Sector ${sendingSector},`
+            message += ` Sector ${sendingSector},`;
         }
         if (sendingCol) {
-            message += ` Column ${sendingCol},`
+            message += ` Column ${letters[sendingCol]},`;
         }
         if (sendingRow) {
-            message += ` Row ${sendingRow},`
+            message += ` Row ${sendingRow + 1},`;
         }
         sendMessage(
             MessageTypes.SEND_DRONES,
