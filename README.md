@@ -26,4 +26,6 @@ Both the UI and server can be run locally via
 
     npm run dev
 
-The address for the web server is (currently) hardcoded in `src/App.js`.
+in each folder.
+
+The address for the web server is (currently) hardcoded in `captain-ui/src/App.js`.
