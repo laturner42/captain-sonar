@@ -17,6 +17,8 @@ export default function Navigator(props) {
         boardHeight,
         sendMessage,
         myTeam,
+        setJobNotes,
+        notes,
     } = props;
 
     const { systems, pendingMove } = myTeam;
@@ -116,7 +118,11 @@ export default function Navigator(props) {
             <ToolBelt
                 height={height}
             >
-                <Notes />
+                <Notes
+                    job={Jobs.FIRSTMATE}
+                    notes={notes}
+                    setJobNotes={setJobNotes}
+                />
                 <EnemyHistory
                     team={myTeam}
                 />

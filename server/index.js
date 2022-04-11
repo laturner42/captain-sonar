@@ -2,7 +2,17 @@ const http = require('http');
 const {
     server: WebSocketServer,
 } = require('websocket');
-const { MessageTypes, Jobs, getTeams, calculateSector, getCurrentLoc, letters, BOARD_WIDTH, TILE_SIZE, Directions } = require('../captian-ui/src/constants');
+const {
+    MessageTypes,
+    Jobs,
+    getTeams,
+    calculateSector,
+    getCurrentLoc,
+    letters,
+    BOARD_WIDTH,
+    TILE_SIZE,
+    Directions,
+} = require('../captian-ui/src/constants');
 const { Systems, SubSystems, DependentSubSystem } = require('../captian-ui/src/components/systems');
 
 const connections = {};

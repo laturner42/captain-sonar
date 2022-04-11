@@ -8,7 +8,7 @@ import {
     BOARD_HEIGHT,
     Jobs as ScreenNames,
     getTeams,
-    getMyRole,
+    getMyRole, Jobs,
 } from '../constants';
 
 import Captain from '../screens/Captain';
@@ -31,7 +31,20 @@ export default function Gameplay(props) {
     const myJob = getMyRole(myTeam, myName);
 
     const [activeScreen, setActiveScreen] = useState(myJob || ScreenNames.CAPTAIN);
+    const [notes, setNotes] = useState({
+        [Jobs.CAPTAIN]: '',
+        [Jobs.FIRSTMATE]: '',
+        [Jobs.NAVIGATOR]: '',
+        [Jobs.ENGINEER]: ''
+    });
 
+    const setJobNotes = (job, newJobNote) => {
+        const newNotes = {
+            ...notes,
+        };
+        newNotes[job] = newJobNote;
+        setNotes(newNotes);
+    }
 
     useEffect(() => {
         if (!myTeam || !enemyTeam) return;
@@ -122,13 +135,13 @@ export default function Gameplay(props) {
                 activeScreen === ScreenNames.CAPTAIN && <Captain pauseAction={gameData.pauseAction} mapNbr={gameData.map} sendMessage={sendMessage} myTeam={myTeam} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                activeScreen === ScreenNames.NAVIGATOR && <Navigator mapNbr={gameData.map} myTeam={myTeam} sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.NAVIGATOR && <Navigator notes={notes} setJobNotes={setJobNotes} mapNbr={gameData.map} myTeam={myTeam} sendMessage={sendMessage} enemyTeam={enemyTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                activeScreen === ScreenNames.FIRSTMATE && <FirstMate sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.FIRSTMATE && <FirstMate notes={notes} setJobNotes={setJobNotes} sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
             {
-                activeScreen === ScreenNames.ENGINEER && <Engineer sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
+                activeScreen === ScreenNames.ENGINEER && <Engineer notes={notes} setJobNotes={setJobNotes} sendMessage={sendMessage} myTeam={myTeam} boardWidth={BOARD_WIDTH} boardHeight={BOARD_HEIGHT} />
             }
         </div>
     );

@@ -1,5 +1,4 @@
 import {
-    Navigation as Arrow,
     MyLocation as Compass,
 } from '@mui/icons-material';
 import {

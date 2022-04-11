@@ -25,15 +25,9 @@ export default function App() {
         sendMessage(MessageTypes.JOIN)
     }
 
-    useEffect(() => {
-        if (!socket) {
-            setTimeout(connect, 1000);
-        }
-    }, [socket])
-
     const connect = () => {
         console.log('Connecting');
-        const ws = new WebSocket('ws://68.184.115.193:9898/');
+        const ws = new WebSocket('ws://127.0.0.1:9898/');
         ws.onopen = () => {
             console.log('Connected');
             setSocket(ws);
@@ -49,6 +43,12 @@ export default function App() {
             console.error(e);
         }
     }
+
+    useEffect(() => {
+        if (!socket) {
+            setTimeout(connect, 1000);
+        }
+    }, [socket])
 
     return (
         <div style={{

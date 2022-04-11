@@ -19,3 +19,11 @@ This version was written in less than a week - it's not the cleanest code.
 The networking code is __extremely__ chatty. Ideally, the Server would only send "updates" to each Client,
 but the quickest and easiest way to get the game up and running was to send the entire game
 structure to every client every time anything changes. `¯\_(ツ)_/¯`
+
+## Running "locally"
+
+Both the UI and server can be run locally via
+
+    npm run dev
+
+The address for the web server is (currently) hardcoded in `src/App.js`.

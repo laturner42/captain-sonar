@@ -3,10 +3,16 @@ import {
     Button,
 } from '@mui/material';
 import {
-    Navigation as Arrow,
     MyLocation as Compass,
 } from '@mui/icons-material';
-import {letters, getCurrentLoc, MessageTypes, TILE_SIZE, BOARD_WIDTH, BOARD_HEIGHT} from '../../constants';
+import {
+    letters,
+    getCurrentLoc,
+    MessageTypes,
+    TILE_SIZE,
+    BOARD_WIDTH,
+    BOARD_HEIGHT,
+} from '../../constants';
 
 export default function TorpedoAction(props) {
     const {

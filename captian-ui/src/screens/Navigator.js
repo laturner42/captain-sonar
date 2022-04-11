@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {
+    Jobs,
     MessageTypes,
     TILE_SIZE,
 } from '../constants';
@@ -20,6 +21,8 @@ export default function Navigator(props) {
         enemyTeam,
         mapNbr,
         sendMessage,
+        setJobNotes,
+        notes,
     } = props;
 
     const [onCurrentPath, setOnCurrentPath] = useState(true);
@@ -126,7 +129,11 @@ export default function Navigator(props) {
                 />
             </div>
             <ToolBelt>
-                <Notes />
+                <Notes
+                    job={Jobs.NAVIGATOR}
+                    notes={notes}
+                    setJobNotes={setJobNotes}
+                />
                 <SystemChoices
                     title="Enemy Systems"
                     team={enemyTeam}

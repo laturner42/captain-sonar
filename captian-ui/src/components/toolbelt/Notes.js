@@ -1,9 +1,11 @@
-import { useState } from 'react';
 import { TOOL_BELT_WIDTH } from '../../constants';
 
-export default function Notes() {
-    const { note, setNote } = useState('');
-
+export default function Notes(props) {
+    const {
+        job,
+        setJobNotes,
+        notes,
+    } = props;
     const width = TOOL_BELT_WIDTH;
 
     return (
@@ -16,6 +18,8 @@ export default function Notes() {
         >
             <span>Notes</span>
             <textarea
+                value={notes[job]}
+                onChange={(event) => setJobNotes(job, event.target.value)}
                 style={{
                     border: '0px',
                     width: width * 0.86,

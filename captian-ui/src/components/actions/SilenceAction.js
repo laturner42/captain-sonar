@@ -3,7 +3,6 @@ import {
     Button,
 } from '@mui/material';
 import {
-    Navigation as Arrow,
     MyLocation as Compass,
 } from '@mui/icons-material';
 import {letters, getCurrentLoc, MessageTypes, TILE_SIZE, BOARD_WIDTH} from '../../constants';

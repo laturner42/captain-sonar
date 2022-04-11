@@ -3,7 +3,6 @@ import {
     Close as RemoveIcon,
 } from '@mui/icons-material'
 import {
-    TextField,
     Button,
 } from '@mui/material';
 import { MessageTypes, Jobs } from '../constants';

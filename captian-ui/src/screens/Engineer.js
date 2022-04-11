@@ -1,7 +1,4 @@
 import {
-    Navigation as Arrow,
-} from '@mui/icons-material';
-import {
     TILE_SIZE, Directions, MessageTypes, Jobs
 } from '../constants';
 import {
@@ -23,6 +20,8 @@ export default function Navigator(props) {
         boardHeight,
         myTeam,
         sendMessage,
+        notes,
+        setJobNotes,
     } = props;
     // const [currentSelection, setCurrentSelection] = useState(null);
 
@@ -252,7 +251,11 @@ export default function Navigator(props) {
                 </div>
             </div>
             <ToolBelt>
-                <Notes />
+                <Notes
+                    job={Jobs.ENGINEER}
+                    notes={notes}
+                    setJobNotes={setJobNotes}
+                />
                 {
                     Object.values(SubSystems)
                         .filter(subsystem => subsystem !== SubSystems.Reactor)

@@ -3,7 +3,6 @@ import {
     TextField,
     Button,
 } from '@mui/material';
-import {MessageTypes} from '../constants';
 
 export default function Join(props) {
     const {
